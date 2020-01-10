@@ -3,7 +3,7 @@ import javax.swing.*;
 
 public class FileButcherMain {
 
-	private JFrame frmFilecutter;
+	private JFrame frmFileButcher;
 	private String FileQueue[];
 
 	/**
@@ -11,7 +11,8 @@ public class FileButcherMain {
 	 */
 	public static void main(String[] args) {
 		FileButcherMain window = new FileButcherMain();
-		window.frmFilecutter.setVisible(true);
+		//frmFileButcher = new JFrame();
+		window.frmFileButcher.setVisible(true);
 	}
 
 	/**
@@ -25,19 +26,19 @@ public class FileButcherMain {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frmFilecutter = new JFrame();
-		frmFilecutter.setTitle("FileCutter");
-		frmFilecutter.setBounds(100, 100, 450, 300);
-		frmFilecutter.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frmFilecutter.getContentPane().setLayout(null);
+		frmFileButcher = new JFrame();
+		frmFileButcher.setTitle("FileCutter");
+		frmFileButcher.setBounds(100, 100, 450, 300);
+		frmFileButcher.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmFileButcher.getContentPane().setLayout(null);
 		
 		JButton btnSelectFile = new JButton("Seleziona File");
 		btnSelectFile.setBounds(10, 11, 89, 23);
-		frmFilecutter.getContentPane().add(btnSelectFile);
+		frmFileButcher.getContentPane().add(btnSelectFile);
 		
 		JPanel panel = new JPanel();
 		panel.setBounds(282, 11, 142, 239);
-		frmFilecutter.getContentPane().add(panel);
+		frmFileButcher.getContentPane().add(panel);
 		
 		JList FCQueue = new JList(FileQueue);
 		panel.add(FCQueue);

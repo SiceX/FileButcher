@@ -33,11 +33,11 @@ public class FileButcherMain {
 		frmFileButcher.getContentPane().setLayout(null);
 		
 		JButton btnSelectFile = new JButton("Seleziona File");
-		btnSelectFile.setBounds(10, 11, 89, 23);
+		btnSelectFile.setBounds(10, 11, 142, 23);
 		frmFileButcher.getContentPane().add(btnSelectFile);
 		
 		JPanel panel = new JPanel();
-		panel.setBounds(282, 11, 142, 239);
+		panel.setBounds(282, 11, 131, 217);
 		frmFileButcher.getContentPane().add(panel);
 		
 		JList FCQueue = new JList(FileQueue);

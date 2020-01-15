@@ -44,6 +44,22 @@ public class FBTask {
 	public TaskType getType() {
 		return type;
 	}
+	
+	public String getTypeDescription() {
+		switch(type) {
+		case SAME_SIZE:
+			return "Divisione in parti di dimensioni uguali";
+		case CRYPT_SAME_SIZE:
+			return "Divisione in parti di dimensioni uguali con crittografia";
+		case ZIP_CUSTOM_SIZE:
+			return "Divisione e compresione in parti di dimensione specificata";
+		case CUSTOM_NUMBER:
+			return "Divisione in N parti";
+		default:
+			throw new NullPointerException();
+		}
+	}
+	
 	public void setType(TaskType type) {
 		this.type = type;
 	}

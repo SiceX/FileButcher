@@ -6,33 +6,33 @@ public class FBTask {
 	//private File file;
 	private String pathname;
 	private String name;
-	private TaskType type;
+	private TaskMode mode;
 	
-	public FBTask(String path, String n, TaskType t) {
+	public FBTask(String path, String n, TaskMode t) {
 		setPathname(path);
 		setName(n);
-		setType(t);
+		setMode(t);
 	}
 	
 	public FBTask(String path, String n){
-		this(path, n, TaskType.SAME_SIZE);
+		this(path, n, TaskMode.SAME_SIZE);
 	}
 	
 	public FBTask(){
-		this(null, null, TaskType.SAME_SIZE);
+		this(null, null, TaskMode.SAME_SIZE);
 	}
 	
-//	public FBTask(File f, TaskType t) {
+//	public FBTask(File f, TaskMode t) {
 //		setFile(f);
 //		setType(t);
 //	}
 //	
 //	public FBTask(File f){
-//		this(f, TaskType.SAME_SIZE);
+//		this(f, TaskMode.SAME_SIZE);
 //	}
 //	
 //	public FBTask(){
-//		this(null, TaskType.SAME_SIZE);
+//		this(null, TaskMode.SAME_SIZE);
 //	}
 	
 //	public File getFile() {
@@ -41,12 +41,12 @@ public class FBTask {
 //	public void setFile(File file) {
 //		this.file = file;
 //	}
-	public TaskType getType() {
-		return type;
+	public TaskMode getMode() {
+		return mode;
 	}
 	
-	public String getTypeDescription() {
-		switch(type) {
+	public String getModeDescription() {
+		switch(mode) {
 		case SAME_SIZE:
 			return "Divisione in parti di dimensioni uguali";
 		case CRYPT_SAME_SIZE:
@@ -60,8 +60,8 @@ public class FBTask {
 		}
 	}
 	
-	public void setType(TaskType type) {
-		this.type = type;
+	public void setMode(TaskMode type) {
+		this.mode = type;
 	}
 
 	public String getPathname() {

@@ -21,7 +21,7 @@ public class FBQueue extends ConcurrentLinkedQueue<FBTask>{
 		int i=0;
 		while(it.hasNext()) {
 			data[i][0] = it.next().getName();
-			data[i][1] = it.next().getTypeDescription();
+			data[i][1] = it.next().getModeDescription();
 			i++;
 		}
 		

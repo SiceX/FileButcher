@@ -1,18 +1,14 @@
 package gui;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
+import java.awt.*;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
 import logic.TaskMode;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+@SuppressWarnings("serial")
 public class FBSelectMode extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
@@ -22,11 +18,12 @@ public class FBSelectMode extends JDialog {
 	 * Create the dialog.
 	 */
 	@SuppressWarnings("unchecked")
-	public FBSelectMode() {
+	public FBSelectMode(Window owner) {
+		super(owner, "Seleziona modalità di esecuzione", ModalityType.DOCUMENT_MODAL);
 		
 		setTitle("Seleziona azione da eseguire");
 
-		setBounds(100, 100, 146, 175);
+		setBounds(100, 100, 372, 143);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setLayout(new FlowLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -56,6 +53,7 @@ public class FBSelectMode extends JDialog {
 				cancelButton.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseClicked(MouseEvent e) {
+						cmbModeSelect.setSelectedIndex(-1);
 						dispose();
 					}
 				});

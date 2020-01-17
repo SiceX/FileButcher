@@ -22,25 +22,6 @@ public class FBTask {
 		this(null, null, TaskMode.SAME_SIZE);
 	}
 	
-//	public FBTask(File f, TaskMode t) {
-//		setFile(f);
-//		setType(t);
-//	}
-//	
-//	public FBTask(File f){
-//		this(f, TaskMode.SAME_SIZE);
-//	}
-//	
-//	public FBTask(){
-//		this(null, TaskMode.SAME_SIZE);
-//	}
-	
-//	public File getFile() {
-//		return file;
-//	}
-//	public void setFile(File file) {
-//		this.file = file;
-//	}
 	public TaskMode getMode() {
 		return mode;
 	}

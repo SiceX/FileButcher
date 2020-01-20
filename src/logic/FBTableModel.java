@@ -1,5 +1,6 @@
 package logic;
 
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.swing.table.AbstractTableModel;
@@ -7,45 +8,17 @@ import javax.swing.table.AbstractTableModel;
 @SuppressWarnings("serial")
 public class FBTableModel extends AbstractTableModel {
 	
-	private final String[] columnNames = {"File", "Tipo Lavoro"};
-	private ConcurrentLinkedQueue<FBTask> queueData;
+	private final String[] columnNames = {"File", "Modalità"};
+	private final ArrayList<FBTask> data = new ArrayList<FBTask>();
 	
-	public FBTableModel(ConcurrentLinkedQueue<FBTask> queue) {
-		setQueueData(queue);
+	public FBTableModel() {
+		//
 	}
 
 	@Override
     public String getColumnName(int columnIndex){
         return columnNames[columnIndex];
     }
-	
-	@Override
-	public int getColumnCount() {
-		return columnNames.length;
-	}
-
-	@Override
-	public int getRowCount() {
-		getQueueData().size();
-		return 0;
-	}
-
-	@Override
-	public Object getValueAt(int rowIndex, int columnIndex) {
-		FBTask[] taskArray = getQueueData().toArray(new FBTask[0]);
-		
-		if(rowIndex < taskArray.length) {
-			switch(columnIndex) {
-				case 0:	return taskArray[rowIndex].getName();
-				case 1:	return taskArray[rowIndex].getModeDescription();
-				default:	throw new ArrayIndexOutOfBoundsException();
-			}
-		}
-		else {
-			throw new ArrayIndexOutOfBoundsException();
-		}
-		
-	}
 	
 	@Override
 	public Class<?> getColumnClass(int columnIndex){
@@ -56,23 +29,62 @@ public class FBTableModel extends AbstractTableModel {
 		}
 	}
 	
+	@Override
+	public int getColumnCount() {
+		return columnNames.length;
+	}
+
+	@Override
+	public int getRowCount() {
+		return data.size();
+	}
+	
+	@Override
+	public void setValueAt(Object value, int rowIndex, int columnIndex) {
+		TaskMode mode = (TaskMode)value;
+		
+		data.get(rowIndex).setMode(mode);
+	}
+
+	@Override
+	public Object getValueAt(int rowIndex, int columnIndex) {
+		if(rowIndex < data.size()) {
+			switch(columnIndex) {
+				case 0:	return data.get(rowIndex).getName();
+				case 1:	return data.get(rowIndex).getMode();
+				default:	throw new ArrayIndexOutOfBoundsException();
+			}
+		}
+		else {
+			throw new ArrayIndexOutOfBoundsException();
+		}
+		
+	}
+	
+	@Override
+	public boolean isCellEditable(int row, int col) {
+        if(col == 1) return true ;
+        return false;
+     }
+	
 	public void addTask(FBTask task) {
-		queueData.add(task);
-		fireTableRowsInserted(queueData.size(), queueData.size());
+		getData().add(task);
+		fireTableRowsInserted(getData().size(), getData().size());
 	}
+	
+	public void removeTask(FBTask task) {
+        if (getData().contains(task)) {
+            int row = getData().indexOf(task);
+            getData().remove(row);
+            fireTableRowsDeleted(row, row);
+        }
+    }
 
 	/**
-	 * @return the queueData
+	 * @return the data
 	 */
-	public ConcurrentLinkedQueue<FBTask> getQueueData() {
-		return queueData;
-	}
-
-	/**
-	 * @param queueData the queueData to set
-	 */
-	public void setQueueData(ConcurrentLinkedQueue<FBTask> queueData) {
-		this.queueData = queueData;
+	public ArrayList<FBTask> getData() {
+		return data;
 	}
 
 }

@@ -1,6 +1,9 @@
 package gui;
 
 import javax.swing.*;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.table.*;
 
 import logic.FBQueue;
 import logic.FBTableModel;
@@ -26,7 +29,8 @@ public class FBMainWindow extends JFrame{
 	private static final long serialVersionUID = 1L;
 	private final JFileChooser fileChooser = new JFileChooser();
 	//private final ConcurrentLinkedQueue<FBTask> taskQueue = new ConcurrentLinkedQueue<FBTask>();
-	private final FBTableModel tblModel = new FBTableModel(new ConcurrentLinkedQueue<FBTask>());
+	//private final FBQueue taskQueue = new FBQueue();
+	private final FBTableModel tblModel = new FBTableModel();
 	private final JTable tblQueue = new JTable();
 	private final JButton btnChooseFile = new JButton("Seleziona file(s)");
 	private final Window mainWindowReference = this;
@@ -58,10 +62,11 @@ public class FBMainWindow extends JFrame{
 					if(choice != null) {
 						FBTask newTask = createTask(file.getPath(), file.getName(), choice);
 						
-						//taskQueue.add(newTask);
-						FBTableModel model = (FBTableModel)tblQueue.getModel();
+						//FBTableModel model = (FBTableModel)tblQueue.getModel();
+					    //model.addTask(newTask);
+						
+						FBTableModel model = (FBTableModel) tblQueue.getModel();
 					    model.addTask(newTask);
-					    
 					}
 				}
 			}
@@ -73,7 +78,10 @@ public class FBMainWindow extends JFrame{
 		scrollPane.setViewportView(tblQueue);
 		
 		tblQueue.setModel(tblModel);
-		tblQueue.getColumnModel().getColumn(1).setPreferredWidth(107);
+		tblQueue.getColumnModel().getColumn(0).setPreferredWidth(92);
+		JComboBox cmbxCellEditor = new JComboBox(TaskMode.values());
+		DefaultCellEditor editor = new DefaultCellEditor(cmbxCellEditor);
+		tblQueue.getColumnModel().getColumn(1).setCellEditor(editor);
 				
 	}
 	

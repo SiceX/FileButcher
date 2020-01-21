@@ -1,83 +1,105 @@
 package gui;
 
 import javax.swing.*;
-import javax.swing.event.CellEditorListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.table.*;
 
-import logic.FBQueue;
-import logic.FBTableModel;
-import logic.FBTask;
-import logic.FBTaskCryptSameSize;
-import logic.FBTaskCustomNumber;
-import logic.FBTaskSameSize;
-import logic.FBTaskZipCustomSize;
-import logic.TaskMode;
+import logic.*;
 
 import java.awt.*;
-import java.awt.Dialog.ModalityType;
 import java.awt.event.*;
 import java.io.File;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.miginfocom.swing.MigLayout;
 
+@SuppressWarnings("serial")
 public class FBMainWindow extends JFrame{
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
 	private final JFileChooser fileChooser = new JFileChooser();
-	//private final ConcurrentLinkedQueue<FBTask> taskQueue = new ConcurrentLinkedQueue<FBTask>();
-	//private final FBQueue taskQueue = new FBQueue();
-	private final FBTableModel tblModel = new FBTableModel();
 	private final JTable tblQueue = new JTable();
 	private final JButton btnChooseFile = new JButton("Seleziona file(s)");
 	private final Window mainWindowReference = this;
+	private final JPanel panel = new JPanel();
+	private final JButton btnRemoveSelected = new JButton("Rimuovi selezionati");
+	private final JButton btnButcher = new JButton("Esegui scomposizioni");
+	private final JButton btnRebuild = new JButton("Ricomponi file");
 	
 		
 
-	@SuppressWarnings("serial")
 	public FBMainWindow() {
 		super();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("FileButcher");
 		setSize(450, 300);
-		getContentPane().setLayout(new MigLayout("", "[143px][60.00][111.00px,grow]", "[212px,grow]"));
+		getContentPane().setLayout(new MigLayout("", "[154.00px,left][45.00][111.00px,grow]", "[212px,grow]"));
+		panel.setBorder(null);
+		
+		fileChooser.setMultiSelectionEnabled(true);
+		
+		getContentPane().add(panel, "cell 0 0,growx,aligny top");
+		panel.setLayout(new GridLayout(5, 1, 0, 10));
+		panel.add(btnChooseFile);
+		btnRemoveSelected.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				FBTableModel model = (FBTableModel)tblQueue.getModel();
+				model.removeSelectedRows(tblQueue.getSelectedRows());
+			}
+		});
+		
+		panel.add(btnRemoveSelected);
+		btnButcher.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				FBTableModel model = (FBTableModel)tblQueue.getModel();
+				Butcher.executeOrder66(model.getData());
+			}
+		});
+		
+		panel.add(btnButcher);
+		
+		panel.add(btnRebuild);
 		
 		btnChooseFile.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				int res = fileChooser.showOpenDialog(mainWindowReference);
 				if(res == JFileChooser.APPROVE_OPTION) {
-					File file = fileChooser.getSelectedFile();
+					File[] files = fileChooser.getSelectedFiles();
 					
-					FBSelectMode dialog = new FBSelectMode(mainWindowReference);
-					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-					
-					dialog.setVisible(true);
-					
-					TaskMode choice = dialog.getChoice();
-					
-					if(choice != null) {
-						FBTask newTask = createTask(file.getPath(), file.getName(), choice);
+					for(int i=0; i<files.length; i++) {
+						FBSelectMode dialog = new FBSelectMode(mainWindowReference, files[i].getName());
+						dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 						
-						//FBTableModel model = (FBTableModel)tblQueue.getModel();
-					    //model.addTask(newTask);
+						dialog.setVisible(true);
 						
-						FBTableModel model = (FBTableModel) tblQueue.getModel();
-					    model.addTask(newTask);
+						TaskMode choice = dialog.getChoice();
+						
+						if(choice != null) {
+							FBTask newTask = createTask(files[i].getPath(), files[i].getName(), choice);
+							
+							FBTableModel model = (FBTableModel) tblQueue.getModel();
+						    model.addTask(newTask);
+						}
 					}
 				}
 			}
 		});
-		getContentPane().add(btnChooseFile, "cell 0 0,growx,aligny top");
 		
 		JScrollPane scrollPane = new JScrollPane();
 		getContentPane().add(scrollPane, "cell 2 0,grow");
+		tblQueue.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				if(arg0.getKeyCode() == KeyEvent.VK_DELETE) {
+					FBTableModel model = (FBTableModel)tblQueue.getModel();
+					model.removeSelectedRows(tblQueue.getSelectedRows());
+				}
+			}
+		});
 		scrollPane.setViewportView(tblQueue);
 		
-		tblQueue.setModel(tblModel);
+		tblQueue.setModel(new FBTableModel());
 		tblQueue.getColumnModel().getColumn(0).setPreferredWidth(92);
 		JComboBox cmbxCellEditor = new JComboBox(TaskMode.values());
 		DefaultCellEditor editor = new DefaultCellEditor(cmbxCellEditor);

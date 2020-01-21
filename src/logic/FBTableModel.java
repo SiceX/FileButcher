@@ -68,17 +68,23 @@ public class FBTableModel extends AbstractTableModel {
      }
 	
 	public void addTask(FBTask task) {
-		getData().add(task);
-		fireTableRowsInserted(getData().size(), getData().size());
+		data.add(task);
+		fireTableRowsInserted(data.size(), data.size());
 	}
 	
 	public void removeTask(FBTask task) {
-        if (getData().contains(task)) {
-            int row = getData().indexOf(task);
-            getData().remove(row);
+        if (data.contains(task)) {
+            int row = data.indexOf(task);
+            data.remove(row);
             fireTableRowsDeleted(row, row);
         }
     }
+	
+	public void removeSelectedRows(int[] selection) {
+		for(int i=selection.length-1; i>=0; i--) {
+			removeTask(data.get(selection[i]));
+		}
+	}
 
 	/**
 	 * @return the data

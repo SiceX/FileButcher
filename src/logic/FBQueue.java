@@ -1,10 +1,10 @@
 package logic;
 
-import java.io.File;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @SuppressWarnings("serial")
+@Deprecated
 public class FBQueue extends ConcurrentLinkedQueue<FBTask>{
 	
 	public String data[][];

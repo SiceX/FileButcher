@@ -68,7 +68,7 @@ public class FBMainWindow extends JFrame{
 					File[] files = fileChooser.getSelectedFiles();
 					
 					for(int i=0; i<files.length; i++) {
-						FBSelectMode dialog = new FBSelectMode(mainWindowReference, files[i].getName());
+						FBSelectMode dialog = new FBSelectMode(mainWindowReference, files[i]);
 						dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 						
 						dialog.setVisible(true);
@@ -76,7 +76,7 @@ public class FBMainWindow extends JFrame{
 						TaskMode choice = dialog.getChoice();
 						
 						if(choice != null) {
-							FBTask newTask = createTask(files[i].getPath(), files[i].getName(), choice);
+							FBTask newTask = createTask(files[i].getPath(), files[i].getName(), dialog);
 							
 							FBTableModel model = (FBTableModel) tblQueue.getModel();
 						    model.addTask(newTask);
@@ -107,11 +107,11 @@ public class FBMainWindow extends JFrame{
 				
 	}
 	
-	private FBTask createTask(String path, String name, TaskMode choice) {
-		switch(choice) {
-			case SAME_SIZE:			return new FBTaskSameSize(path, name);
+	private FBTask createTask(String path, String name, FBSelectMode dialog) {
+		switch(dialog.getChoice()) {
+			case SAME_SIZE:			return new FBTaskSameSize(path, name, dialog.getPartsSize());
 			
-			case CRYPT_SAME_SIZE:	return new FBTaskCryptSameSize(path, name);
+			case CRYPT_SAME_SIZE:	return new FBTaskCryptSameSize(path, name, dialog.getPartsSize());
 			
 			case ZIP_CUSTOM_SIZE:	return new FBTaskZipCustomSize(path, name);
 			

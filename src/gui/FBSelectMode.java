@@ -7,6 +7,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.text.NumberFormatter;
 
 import logic.TaskMode;
+import logic.Unit;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
@@ -32,7 +34,7 @@ public class FBSelectMode extends JDialog {
 	private final JLabel lblFileName = new JLabel("");
 	private final JPanel modePanel = new JPanel();
 	private JFormattedTextField sizeField;
-	private final JComboBox cmbUnit = new JComboBox();
+	private final JComboBox<Unit> cmbUnit = new JComboBox<Unit>();
 	private final JPanel numberPanel = new JPanel();
 	private JFormattedTextField numberField;
 	private final JLabel lblNewLabel = new JLabel("parti");
@@ -59,7 +61,6 @@ public class FBSelectMode extends JDialog {
 		NumberFormatter numberFormatter = new NumberFormatter(longFormat);
 		numberFormatter.setValueClass(Long.class); //optional, ensures you will always get a long value
 		numberFormatter.setAllowsInvalid(false); //this is the key!!
-		numberFormatter.setMinimum(0l); //Optional
 
 		sizeField = new JFormattedTextField(numberFormatter);
 		sizeField.addFocusListener(new FocusAdapter() {
@@ -84,7 +85,7 @@ public class FBSelectMode extends JDialog {
 		
 		sizePanel.add(sizeField);
 		cmbUnit.setMaximumRowCount(4);
-		cmbUnit.setModel(new DefaultComboBoxModel(new String[] {"B", "KB", "MB", "GB"}));
+		cmbUnit.setModel(new DefaultComboBoxModel<Unit>(Unit.values()));
 		cmbUnit.setSelectedIndex(0);
 		
 		sizePanel.add(cmbUnit);
@@ -101,6 +102,7 @@ public class FBSelectMode extends JDialog {
 		flowLayout_1.setAlignment(FlowLayout.LEFT);
 		
 		getContentPane().add(customPanel, "cell 0 3,grow");
+		btnAddPartSize.setEnabled(false);
 		btnAddPartSize.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -189,12 +191,12 @@ public class FBSelectMode extends JDialog {
 	}
 	
 	private int getUnit() {
-		switch(cmbUnit.getSelectedIndex()) {
-			case 0:	return 1;
-			case 1: return 1024;
-			case 2:	return 1024*1024;
-			case 3: return 1024*1024*1024;
-			default: throw new NullPointerException();
+		switch((Unit)cmbUnit.getSelectedItem()) {
+			case B:		return 1;
+			case KB:	return 1024;
+			case MB:	return 1024*1024;
+			case GB:	return 1024*1024*1024;
+			default: 	throw new NullPointerException();
 		}
 	}
 	

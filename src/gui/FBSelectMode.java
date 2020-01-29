@@ -46,6 +46,15 @@ public class FBSelectMode extends JDialog {
 	 * Grandezza della parte in byte
 	 */
 	private long partsSize;
+	
+	
+	/*
+	 * 
+	 * TODO
+	 * MAKE SAME SIZE TEXT FIELD HAVE A MAX WITH PARTSIZEFILTER
+	 * TODO
+	 * 
+	 */
 
 	/**
 	 * Create the dialog.
@@ -109,13 +118,14 @@ public class FBSelectMode extends JDialog {
 				FBDefineParts dialog;
 				long newPartSize = 0;
 				long remainingSize = file.length();
-				while(remainingSize > 0) {
+				while(remainingSize > 0 && newPartSize >= 0) {
 					dialog = new FBDefineParts(thisDialogReference, remainingSize);
 					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 					dialog.setVisible(true);
 					newPartSize = dialog.getNewPartSize();
-					remainingSize -= newPartSize;
-					
+					if(newPartSize >= 0) {
+						remainingSize -= newPartSize;
+					}
 					//TODO: AGGIUNGI A TABELLA NUOVA PARTE
 				}
 			}

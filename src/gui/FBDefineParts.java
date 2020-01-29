@@ -1,15 +1,19 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.Dialog.ModalityType;
 import java.text.NumberFormat;
 
 import javax.swing.*;
-import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.border.EmptyBorder;
-import javax.swing.text.NumberFormatter;
+import javax.swing.border.LineBorder;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.Document;
+import logic.PartSizeFilter;
 
 import logic.TaskMode;
 import logic.Unit;
@@ -27,8 +31,9 @@ public class FBDefineParts extends JDialog {
 	private final JPanel contentPanel = new JPanel();
 	private final JComboBox<Unit> cmbUnit = new JComboBox<Unit>();
 	private JLabel lblSizeLeft;
-	private JFormattedTextField partSizeField;
-	private NumberFormatter numberFormatter;
+	private JTextField partSizeField;
+	//private NumberFormatter numberFormatter;
+	private PartSizeFilter partSizeFilter;
 	private long remainingSize;
 	private long newPartSize;
 
@@ -40,10 +45,10 @@ public class FBDefineParts extends JDialog {
 		
 		remainingSize = size;
 		
-		NumberFormat longFormat = NumberFormat.getIntegerInstance();
-		NumberFormatter numberFormatter = new NumberFormatter(longFormat);
-		numberFormatter.setValueClass(Long.class); //optional, ensures you will always get a long value
-		numberFormatter.setAllowsInvalid(false); //this is the key!!
+//		NumberFormat longFormat = NumberFormat.getIntegerInstance();
+//		NumberFormatter numberFormatter = new NumberFormatter(longFormat);
+//		numberFormatter.setValueClass(Long.class); //optional, ensures you will always get a long value
+//		numberFormatter.setAllowsInvalid(true); //this is the key!!
 		
 		setBounds(100, 100, 265, 223);
 		getContentPane().setLayout(new BorderLayout());
@@ -57,15 +62,16 @@ public class FBDefineParts extends JDialog {
 		}
 		{
 			//Il massimo deve essere impostato in base all'unità di misura selezionata, che all'inizio è B(Byte)
-			numberFormatter.setMaximum(remainingSize/1);	
+			partSizeFilter = new PartSizeFilter(remainingSize/1);
 			
-			partSizeField = new JFormattedTextField(numberFormatter);
-			partSizeField.addFocusListener(new FocusAdapter() {
-				@Override
-				public void focusLost(FocusEvent e) {
-					newPartSize = Integer.parseUnsignedInt(partSizeField.getText()) * getUnit();
-				}
-			});
+			partSizeField = new JTextField();
+			
+			Document doc = partSizeField.getDocument();
+			if (doc instanceof AbstractDocument) {
+			    AbstractDocument abDoc = (AbstractDocument)doc;
+			    abDoc.setDocumentFilter(partSizeFilter);
+			} 
+			
 			partSizeField.setColumns(10);
 			contentPanel.add(partSizeField);
 		}
@@ -77,9 +83,9 @@ public class FBDefineParts extends JDialog {
 				public void itemStateChanged(ItemEvent arg0) {
 					if (arg0.getStateChange() == ItemEvent.SELECTED) {
 						//Il massimo deve essere impostato in base all'unità di misura selezionata
-						numberFormatter.setMaximum(remainingSize/getUnit());	
-						
-						partSizeField = new JFormattedTextField(numberFormatter);
+						partSizeFilter.setMaxSize(remainingSize/getUnit());
+						//Quando viene cambiato il massimo, effettuo un replace con la stessa stringa. Se questa non passa il filtro, svuoto il campo.
+						partSizeField.setText(partSizeField.getText());
 						
 						lblSizeLeft.setText("Rimangono ancora " + remainingSize/getUnit() + cmbUnit.getSelectedItem());
 					}
@@ -96,7 +102,14 @@ public class FBDefineParts extends JDialog {
 				okButton.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseClicked(MouseEvent e) {
-						dispose();
+						if(partSizeField.getText().equals("")) {
+							partSizeField.setBorder(new LineBorder(Color.RED, 2));
+							Toolkit.getDefaultToolkit().beep();
+						}
+						else {
+							newPartSize = Long.parseLong(partSizeField.getText());
+							dispose();
+						}
 					}
 				});
 				okButton.setActionCommand("OK");
@@ -105,6 +118,13 @@ public class FBDefineParts extends JDialog {
 			}
 			{
 				JButton cancelButton = new JButton("Cancel");
+				cancelButton.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						newPartSize = -1;
+						dispose();
+					}
+				});
 				cancelButton.setActionCommand("Cancel");
 				buttonPane.add(cancelButton);
 			}

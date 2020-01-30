@@ -11,8 +11,8 @@
 	<classpathentry kind="lib" path="C:/Users/nicola.ferrari/eclipseJava11-workspace/FileButcher/libraries/org.eclipse.swt.win32.win32.x86_64_3.113.0.v20191204-0601.jar" sourcepath="F:/Program Files/eclipse/plugins/org.eclipse.swt.win32.win32.x86_64_3.113.0.v20191204-0601.jar"/>
 	<classpathentry kind="lib" path="C:/Users/nicola.ferrari/eclipseJava11-workspace/FileButcher/libraries/org.eclipse.jface.text_3.16.100.v20191203-1634.jar" sourcepath="F:/Program Files/eclipse/plugins/org.eclipse.jface_3.18.0.v20191122-2109.jar"/>
 	<classpathentry kind="lib" path="C:/Users/nicola.ferrari/eclipseJava11-workspace/FileButcher/libraries/org.eclipse.ui.workbench_3.117.0.v20191126-1131.jar" sourcepath="F:/Program Files/eclipse/plugins/org.eclipse.ui.workbench_3.117.0.v20191126-1131.jar"/>
-	<classpathentry kind="lib" path="C:/Users/nicola.ferrari/eclipseJava11-workspace/FileButcher/libraries/com.ibm.icu_64.2.0.v20190507-1337.jar" sourcepath="F:/Program Files/eclipse/plugins/com.ibm.icu_64.2.0.v20190507-1337.jar"/>
 	<classpathentry kind="lib" path="C:/Users/nicola.ferrari/eclipseJava11-workspace/FileButcher/libraries/org.eclipse.ui.forms_3.8.200.v20191114-0830.jar" sourcepath="F:/Program Files/eclipse/plugins/org.eclipse.ui.forms_3.8.200.v20191114-0830.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="C:/Users/nicola.ferrari/eclipseJava11-workspace/FileButcher/libraries/miglayout15-swing.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -15,7 +15,7 @@ public class FBMainWindow extends JFrame{
 	/**
 	 * 
 	 */
-	private final JFileChooser fileChooser = new JFileChooser();
+	private final JFileChooser fileChooser = new JFileChooser(System.getenv("HOMEPATH"));
 	private final JTable tblQueue = new JTable();
 	private final JButton btnChooseFile = new JButton("Seleziona file(s)");
 	private final Window mainWindowReference = this;

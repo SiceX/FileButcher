@@ -12,6 +12,7 @@ import logic.Unit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import net.miginfocom.swing.MigLayout;
@@ -22,30 +23,45 @@ import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import javax.swing.table.DefaultTableModel;
 
 @SuppressWarnings("serial")
 public class FBSelectMode extends JDialog {
 
-	private final Window thisDialogReference = this;
 	private final JPanel sizePanel = new JPanel();
 	private final JComboBox<TaskMode> cmbModeSelect = new JComboBox<TaskMode>();
 	private final JButton okButton = new JButton("OK");
 	private final JButton cancelButton = new JButton("Cancel");
 	private final JLabel lblFileName = new JLabel("");
 	private final JPanel modePanel = new JPanel();
-	private JFormattedTextField sizeField;
 	private final JComboBox<Unit> cmbUnit = new JComboBox<Unit>();
 	private final JPanel numberPanel = new JPanel();
-	private JFormattedTextField numberField;
 	private final JLabel lblNewLabel = new JLabel("parti");
 	private final JPanel customPanel = new JPanel();
 	private final JButton btnAddPartSize = new JButton("Definisci parti");
 	private final JTable tblParts = new JTable();
-	
+	private final Window thisDialogReference = this;
+
 	/**
 	 * Grandezza della parte in byte
 	 */
 	private long partsSize;
+	private JFormattedTextField numberField;
+	private JFormattedTextField sizeField;
+	private DefaultTableModel customPartsModel = new DefaultTableModel(
+		new Double[][] {},
+		new String[] {
+			"Dimensione"
+		}
+	) {
+		Class[] columnTypes = new Class[] {
+			Integer.class
+		};
+		public Class getColumnClass(int columnIndex) {
+			return columnTypes[columnIndex];
+		}
+	};
+	
 	
 	
 	/*
@@ -86,8 +102,8 @@ public class FBSelectMode extends JDialog {
 		
 		setTitle("Seleziona azione da eseguire");
 
-		setBounds(100, 100, 380, 373);
-		getContentPane().setLayout(new MigLayout("", "[358px,grow]", "[54.00px][top][top][100px,grow,fill][39px]"));
+		setBounds(100, 100, 557, 373);
+		getContentPane().setLayout(new MigLayout("", "[358px,trailing][grow]", "[54.00px][top][grow,top][100px,grow,fill][39px]"));
 		sizePanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(sizePanel, "cell 0 1,grow");
 		sizePanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 5));
@@ -107,6 +123,11 @@ public class FBSelectMode extends JDialog {
 		numberPanel.add(numberField);
 		
 		numberPanel.add(lblNewLabel);
+		
+		tblParts.setModel(customPartsModel);
+		tblParts.getColumnModel().getColumn(0).setResizable(false);
+		
+		getContentPane().add(tblParts, "cell 1 1 1 3,grow");
 		FlowLayout flowLayout_1 = (FlowLayout) customPanel.getLayout();
 		flowLayout_1.setAlignment(FlowLayout.LEFT);
 		
@@ -116,8 +137,8 @@ public class FBSelectMode extends JDialog {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				FBDefineParts dialog;
-				long newPartSize = 0;
-				long remainingSize = file.length();
+				double newPartSize = 0;
+				double remainingSize = file.length();
 				while(remainingSize > 0 && newPartSize >= 0) {
 					dialog = new FBDefineParts(thisDialogReference, remainingSize);
 					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -125,15 +146,14 @@ public class FBSelectMode extends JDialog {
 					newPartSize = dialog.getNewPartSize();
 					if(newPartSize >= 0) {
 						remainingSize -= newPartSize;
+						customPartsModel.addRow(new Double[] {newPartSize});
 					}
-					//TODO: AGGIUNGI A TABELLA NUOVA PARTE
 				}
 			}
 		});
 		
-		customPanel.add(btnAddPartSize);
 		
-		customPanel.add(tblParts);
+		customPanel.add(btnAddPartSize);
 		{
 			JPanel buttonPanel = new JPanel();
 			getContentPane().add(buttonPanel, "cell 0 4,growx,aligny top");
@@ -161,7 +181,7 @@ public class FBSelectMode extends JDialog {
 		}
 		modePanel.setBorder(null);
 		
-		getContentPane().add(modePanel, "cell 0 0,growx,aligny top");
+		getContentPane().add(modePanel, "cell 0 0 2 1,growx,aligny top");
 		{
 			modePanel.add(lblFileName);
 			lblFileName.setText(file.getName());

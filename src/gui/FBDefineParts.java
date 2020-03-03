@@ -5,9 +5,6 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.Window;
-import java.awt.Dialog.ModalityType;
-import java.text.NumberFormat;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
@@ -15,15 +12,13 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import logic.PartSizeFilter;
 
-import logic.TaskMode;
 import logic.Unit;
 
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.DecimalFormat;
 
 @SuppressWarnings("serial")
 public class FBDefineParts extends JDialog {
@@ -34,13 +29,13 @@ public class FBDefineParts extends JDialog {
 	private JTextField partSizeField;
 	//private NumberFormatter numberFormatter;
 	private PartSizeFilter partSizeFilter;
-	private long remainingSize;
-	private long newPartSize;
+	private double remainingSize;
+	private double newPartSize;
 
 	/**
 	 * Create the dialog.
 	 */
-	public FBDefineParts(Window owner, long size) {
+	public FBDefineParts(Window owner, double size) {
 		super(owner, "Definisci dimensioni parti", ModalityType.DOCUMENT_MODAL);
 		
 		remainingSize = size;
@@ -87,7 +82,8 @@ public class FBDefineParts extends JDialog {
 						//Quando viene cambiato il massimo, effettuo un replace con la stessa stringa. Se questa non passa il filtro, svuoto il campo.
 						partSizeField.setText(partSizeField.getText());
 						
-						lblSizeLeft.setText("Rimangono ancora " + remainingSize/getUnit() + cmbUnit.getSelectedItem());
+						DecimalFormat df = new DecimalFormat("#.##");
+						lblSizeLeft.setText("Rimangono ancora " + df.format(remainingSize/getUnit()) + cmbUnit.getSelectedItem());
 					}
 				}
 			});
@@ -144,8 +140,8 @@ public class FBDefineParts extends JDialog {
 	/**
 	 * @return the newPartSize
 	 */
-	public long getNewPartSize() {
-		return newPartSize;
+	public double getNewPartSize() {
+		return newPartSize*getUnit();
 	}
 
 }

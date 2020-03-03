@@ -15,61 +15,73 @@ import javax.swing.text.DocumentFilter;
  */
 public class PartSizeFilter extends DocumentFilter {
 
-	private long maxSize;
-	private boolean doEmptyOnWrongReplace = false;
+	private double maxSize;
+	//private boolean doEmptyOnWrongReplace = false;
  
-    public PartSizeFilter(long max) {
-    	maxSize = max;
+    public PartSizeFilter(double d) {
+    	maxSize = d;
     }
  
     public void insertString(FilterBypass fb, int offs, String str, AttributeSet a) throws BadLocationException {
-    	try {
-    		long number = Long.parseLong(fb.getDocument().getText(0, fb.getDocument().getLength()) + str);
     	
-	        if (number <= maxSize)
-	            super.insertString(fb, offs, str, a);
-	        else
-	            Toolkit.getDefaultToolkit().beep();
-    	}
-        catch(NumberFormatException e) {
-        	Toolkit.getDefaultToolkit().beep();
-    	}
+    	//Match anche di numeri in via di scrittura (e.g: '54.'). In tal caso, il parse del numero fallisce, ma non lo
+    	//reputo un errore: faccio il catch dell'eccezione e non faccio niente. 
+    	//Se il parse ha successo, allora procedo con l'assicurarmi che il numero sia minore del massimo
+    	if( fb.getDocument().getText(0, fb.getDocument().getLength()).matches("^[0-9]+[.]?[0-9]*$") ) {
+    		try {
+    			double number = Double.parseDouble(fb.getDocument().getText(0, fb.getDocument().getLength()) + str);
+    	
+		        if (number <= maxSize)
+		            super.insertString(fb, offs, str, a);
+		        else
+		            Toolkit.getDefaultToolkit().beep();
+    		}
+    		catch(NumberFormatException e) {}
+		}
+        else
+            Toolkit.getDefaultToolkit().beep();
+        
     }
      
     public void replace(FilterBypass fb, int offs, int length, String str, AttributeSet a) throws BadLocationException {
-    	try {
-	    	String oldStr = fb.getDocument().getText(0, fb.getDocument().getLength());
-	    	String newStr = oldStr.substring(0, offs) + str + oldStr.substring(offs+length, oldStr.length());
+    	String oldStr = fb.getDocument().getText(0, fb.getDocument().getLength());
+    	String newStr = oldStr.substring(0, offs) + str + oldStr.substring(offs+length, oldStr.length());
+    	
+    	//Match anche di numeri in via di scrittura (e.g: '54.'). In tal caso, il parse del numero fallisce, ma non lo
+    	//reputo un errore: faccio il catch dell'eccezione e non faccio niente. 
+    	//Se il parse ha successo, allora procedo con l'assicurarmi che il numero sia minore del massimo
+    	if( newStr.matches("^[0-9]+[.]?[0-9]*$") ) {
+    		try {
+    			double number = Double.parseDouble(newStr);
 	    	
-	    	long number = Long.parseLong(newStr);
-	    	
-	        if (number <= maxSize) {
-	            super.replace(fb, offs, length, str, a);
-	    	}
-	        else if(doEmptyOnWrongReplace) {
-	        	super.replace(fb, 0, fb.getDocument().getLength(), "", a);
-	        	doEmptyOnWrongReplace = true;
-	        }
-	        else {
-	            Toolkit.getDefaultToolkit().beep();
-	        }
+		        if (number <= maxSize) {
+		            super.replace(fb, offs, length, str, a);
+		    	}
+		        //else if(doEmptyOnWrongReplace) {
+		        //	super.replace(fb, 0, fb.getDocument().getLength(), "", a);
+		        	//doEmptyOnWrongReplace = true;
+		        //}
+		        else {
+		            Toolkit.getDefaultToolkit().beep();
+		        }
+    		}
+        	catch(NumberFormatException e) {}
     	}
-    	catch(NumberFormatException e) {
-    		Toolkit.getDefaultToolkit().beep();
-    	}
+        else
+            Toolkit.getDefaultToolkit().beep();
     }
 
 	/**
 	 * @return the maxSize
 	 */
-	public long getMaxSize() {
+	public double getMaxSize() {
 		return maxSize;
 	}
 
 	/**
 	 * @param maxSize the maxSize to set
 	 */
-	public void setMaxSize(long maxSize) {
+	public void setMaxSize(double maxSize) {
 		this.maxSize = maxSize;
 		//Quando viene cambiato il massimo, viene effettuato un replace con la stessa stringa. Se questa non passa il filtro, svuoto il campo.
 		doEmptyOnWrongReplace = true;

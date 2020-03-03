@@ -16,7 +16,7 @@ import javax.swing.text.DocumentFilter;
 public class PartSizeFilter extends DocumentFilter {
 
 	private double maxSize;
-	//private boolean doEmptyOnWrongReplace = false;
+	private boolean doEmptyOnWrongReplace = false;
  
     public PartSizeFilter(double d) {
     	maxSize = d;
@@ -57,10 +57,10 @@ public class PartSizeFilter extends DocumentFilter {
 		        if (number <= maxSize) {
 		            super.replace(fb, offs, length, str, a);
 		    	}
-		        //else if(doEmptyOnWrongReplace) {
-		        //	super.replace(fb, 0, fb.getDocument().getLength(), "", a);
-		        	//doEmptyOnWrongReplace = true;
-		        //}
+		        else if(doEmptyOnWrongReplace) {
+		        	super.replace(fb, 0, fb.getDocument().getLength(), "", a);
+		        	doEmptyOnWrongReplace = false;
+		        }
 		        else {
 		            Toolkit.getDefaultToolkit().beep();
 		        }

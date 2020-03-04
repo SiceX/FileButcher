@@ -26,6 +26,7 @@ import java.awt.event.FocusEvent;
 import javax.swing.table.DefaultTableModel;
 
 @SuppressWarnings("serial")
+@Deprecated
 public class FBSelectMode extends JDialog {
 
 	private final JPanel sizePanel = new JPanel();

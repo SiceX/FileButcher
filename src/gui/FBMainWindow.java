@@ -13,9 +13,10 @@ import net.miginfocom.swing.MigLayout;
 @SuppressWarnings("serial")
 public class FBMainWindow extends JFrame{
 	/**
-	 * 
+	 * "F:\\Event\\Download" per Event,
+	 * System.getenv("HOMEPATH") + "\\Download" per altri pc
 	 */
-	private final JFileChooser fileChooser = new JFileChooser(System.getenv("HOMEPATH"));
+	private final JFileChooser fileChooser = new JFileChooser("F:\\Event\\Download");
 	private final JTable tblQueue = new JTable();
 	private final JButton btnChooseFile = new JButton("Seleziona file(s)");
 	private final Window mainWindowReference = this;
@@ -68,19 +69,19 @@ public class FBMainWindow extends JFrame{
 					File[] files = fileChooser.getSelectedFiles();
 					
 					for(int i=0; i<files.length; i++) {
-						FBSelectMode dialog = new FBSelectMode(mainWindowReference, files[i]);
-						dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+						//FBSelectMode dialog = new FBSelectMode(mainWindowReference, files[i]);
+						//dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 						
-						dialog.setVisible(true);
+						//dialog.setVisible(true);
 						
-						TaskMode choice = dialog.getChoice();
+						//TaskMode choice = dialog.getChoice();
 						
-						if(choice != null) {
-							FBTask newTask = createTask(files[i].getPath(), files[i].getName(), dialog);
-							
-							FBTableModel model = (FBTableModel) tblQueue.getModel();
-						    model.addTask(newTask);
-						}
+						//if(choice != null) {
+						FBTask newTask = createTask(files[i].getPath(), files[i].getName());
+						
+						FBTableModel model = (FBTableModel) tblQueue.getModel();
+					    model.addTask(newTask);
+						//}
 					}
 				}
 			}
@@ -107,18 +108,22 @@ public class FBMainWindow extends JFrame{
 				
 	}
 	
-	private FBTask createTask(String path, String name, FBSelectMode dialog) {
-		switch(dialog.getChoice()) {
-			case SAME_SIZE:			return new FBTaskSameSize(path, name, dialog.getPartsSize());
-			
-			case CRYPT_SAME_SIZE:	return new FBTaskCryptSameSize(path, name, dialog.getPartsSize());
-			
-			case ZIP_CUSTOM_SIZE:	return new FBTaskZipCustomSize(path, name);
-			
-			case CUSTOM_NUMBER:		return new FBTaskCustomNumber(path, name);
-			
-			default:				return null;
-		}
+	private FBTask createTask(String path, String name) {
+		return new FBTaskSameSize(path, name, 50);
 	}
+	
+//	private FBTask createTask(String path, String name, FBSelectMode dialog) {
+//		switch(dialog.getChoice()) {
+//			case SAME_SIZE:			return new FBTaskSameSize(path, name, dialog.getPartsSize());
+//			
+//			case CRYPT_SAME_SIZE:	return new FBTaskCryptSameSize(path, name, dialog.getPartsSize());
+//			
+//			case ZIP_CUSTOM_SIZE:	return new FBTaskZipCustomSize(path, name);
+//			
+//			case CUSTOM_NUMBER:		return new FBTaskCustomNumber(path, name, dialo);
+//			
+//			default:				return null;
+//		}
+//	}
 }
 

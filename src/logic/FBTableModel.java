@@ -6,7 +6,7 @@ import javax.swing.table.AbstractTableModel;
 @SuppressWarnings("serial")
 public class FBTableModel extends AbstractTableModel {
 	
-	private final String[] columnNames = {"File", "Modalità"};
+	private final String[] columnNames = {"File", "Modalità", "Specifiche"};
 	private final ArrayList<FBTask> data = new ArrayList<FBTask>();
 	
 	public FBTableModel() {
@@ -23,6 +23,7 @@ public class FBTableModel extends AbstractTableModel {
 		switch(columnIndex) {
 			case 0:	return String.class;
 			case 1:	return String.class;
+			case 2: return String.class;
 			default:	throw new ArrayIndexOutOfBoundsException();
 		}
 	}
@@ -39,9 +40,16 @@ public class FBTableModel extends AbstractTableModel {
 	
 	@Override
 	public void setValueAt(Object value, int rowIndex, int columnIndex) {
-		TaskMode mode = (TaskMode)value;
-		
-		data.get(rowIndex).setMode(mode);
+		if(columnIndex == 1) {	//Modifica tipo di task
+			TaskMode mode = (TaskMode)value;
+			FBTask editedTask = createTask(data.get(rowIndex).getPathname(), data.get(rowIndex).getName(), mode);
+			
+			data.set(rowIndex, editedTask);
+		}
+		else if(columnIndex == 2) { //Modifica parametri del task
+			//TODO DOCUMENT FILTER E CAZZIAMMAZZI
+		}
+	 	fireTableRowsUpdated(rowIndex, rowIndex);
 	}
 
 	@Override
@@ -50,6 +58,7 @@ public class FBTableModel extends AbstractTableModel {
 			switch(columnIndex) {
 				case 0:	return data.get(rowIndex).getName();
 				case 1:	return data.get(rowIndex).getMode();
+				case 2: return data.get(rowIndex).getSpecs();
 				default:	throw new ArrayIndexOutOfBoundsException();
 			}
 		}
@@ -62,6 +71,7 @@ public class FBTableModel extends AbstractTableModel {
 	@Override
 	public boolean isCellEditable(int row, int col) {
         if(col == 1) return true ;
+        if(col == 2) return true ;
         return false;
      }
 	
@@ -89,6 +99,20 @@ public class FBTableModel extends AbstractTableModel {
 	 */
 	public ArrayList<FBTask> getData() {
 		return data;
+	}
+	
+	private FBTask createTask(String path, String name, TaskMode mode) {
+		switch(mode) {
+			case SAME_SIZE:			return new FBTaskSameSize(path, name);
+			
+			case CRYPT_SAME_SIZE:	return new FBTaskCryptSameSize(path, name);
+			
+			case ZIP_CUSTOM_SIZE:	return new FBTaskZipCustomSize(path, name);
+			
+			case CUSTOM_NUMBER:		return new FBTaskCustomNumber(path, name);
+			
+			default:				return null;
+		}
 	}
 
 }

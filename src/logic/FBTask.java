@@ -2,20 +2,20 @@ package logic;
 
 //import java.io.File;
 
-public class FBTask {
+public abstract class FBTask {
 	//private File file;
 	private String pathname;
 	private String name;
 	private TaskMode mode;
 	
-	public FBTask(String path, String n, TaskMode t) {
+	public FBTask(String path, String name, TaskMode tMode) {
 		setPathname(path);
-		setName(n);
-		setMode(t);
+		setName(name);
+		setMode(tMode);
 	}
 	
-	public FBTask(String path, String n){
-		this(path, n, TaskMode.SAME_SIZE);
+	public FBTask(String path, String name){
+		this(path, name, TaskMode.SAME_SIZE);
 	}
 	
 	public FBTask(){
@@ -59,5 +59,9 @@ public class FBTask {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public String getSpecs() {
+		return null;
 	}
 }

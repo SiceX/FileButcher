@@ -1,5 +1,5 @@
 WINDOWBUILDER 
-swt designer
+swing designer
 click dx su classe -> open with -> designer
 
 

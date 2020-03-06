@@ -31,7 +31,7 @@ public class FBMainWindow extends JFrame{
 		super();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("FileButcher");
-		setSize(450, 300);
+		setSize(600, 300);
 		getContentPane().setLayout(new MigLayout("", "[154.00px,left][45.00][111.00px,grow]", "[212px,grow]"));
 		panel.setBorder(null);
 		
@@ -77,7 +77,7 @@ public class FBMainWindow extends JFrame{
 						//TaskMode choice = dialog.getChoice();
 						
 						//if(choice != null) {
-						FBTask newTask = createTask(files[i].getPath(), files[i].getName());
+						FBTask newTask = createTask(files[i].getPath(), files[i].getName(), files[i].length());
 						
 						FBTableModel model = (FBTableModel) tblQueue.getModel();
 					    model.addTask(newTask);
@@ -108,8 +108,8 @@ public class FBMainWindow extends JFrame{
 				
 	}
 	
-	private FBTask createTask(String path, String name) {
-		return new FBTaskSameSize(path, name, 50);
+	private FBTask createTask(String path, String name, long fileSize) {
+		return new FBTaskSameSize(path, name, fileSize, 50);
 	}
 	
 //	private FBTask createTask(String path, String name, FBSelectMode dialog) {

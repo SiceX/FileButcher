@@ -6,15 +6,15 @@ public class FBTaskZipCustomSize extends FBTask {
 	private final String fileExtension = ".zipar";
 	private ArrayList<Integer> partSpecs;
 	
-	public FBTaskZipCustomSize(String path, String name, ArrayList<Integer> specs){
-		super(path, name, TaskMode.ZIP_CUSTOM_SIZE);
+	public FBTaskZipCustomSize(String path, String name, long fileSize, ArrayList<Integer> specs){
+		super(path, name, TaskMode.ZIP_CUSTOM_SIZE, fileSize);
 		partSpecs = specs;
 	}
 	
 	//Default
 	@SuppressWarnings("serial")
-	public FBTaskZipCustomSize(String path, String name){
-		this(path, name, new ArrayList<Integer>() {});
+	public FBTaskZipCustomSize(String path, String name, long fileSize){
+		this(path, name, fileSize, new ArrayList<Integer>() {});
 	}
 
 	/**
@@ -25,9 +25,14 @@ public class FBTaskZipCustomSize extends FBTask {
 	}
 
 	@Override
-	public String getSpecs() {
+	public String getParameters() {
 		return partSpecs.size() + " parti";
-		
+		//TODO
+	}
+	
+	@Override
+	public void setParameters(Object param) {
+		//TODO
 	}
 
 }

@@ -1,12 +1,15 @@
 package logic;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.EventObject;
+
 import javax.swing.table.AbstractTableModel;
 
 @SuppressWarnings("serial")
 public class FBTableModel extends AbstractTableModel {
 	
-	private final String[] columnNames = {"File", "Modalità", "Specifiche"};
+	private final String[] columnNames = {"File", "Modalità", "Parametri", "Dimensione"};
 	private final ArrayList<FBTask> data = new ArrayList<FBTask>();
 	
 	public FBTableModel() {
@@ -24,6 +27,7 @@ public class FBTableModel extends AbstractTableModel {
 			case 0:	return String.class;
 			case 1:	return String.class;
 			case 2: return String.class;
+			case 3: return String.class;
 			default:	throw new ArrayIndexOutOfBoundsException();
 		}
 	}
@@ -37,19 +41,63 @@ public class FBTableModel extends AbstractTableModel {
 	public int getRowCount() {
 		return data.size();
 	}
-	
+		
 	@Override
 	public void setValueAt(Object value, int rowIndex, int columnIndex) {
 		if(columnIndex == 1) {	//Modifica tipo di task
 			TaskMode mode = (TaskMode)value;
-			FBTask editedTask = createTask(data.get(rowIndex).getPathname(), data.get(rowIndex).getName(), mode);
+			FBTask editedTask = createTask(data.get(rowIndex).getPathname(), data.get(rowIndex).getName(), mode, data.get(rowIndex).getFileSize());
 			
 			data.set(rowIndex, editedTask);
 		}
 		else if(columnIndex == 2) { //Modifica parametri del task
-			//TODO DOCUMENT FILTER E CAZZIAMMAZZI
+			String newStr = (String)value;
+			TaskMode mode = data.get(rowIndex).getMode();
+			if(mode == TaskMode.SAME_SIZE || mode == TaskMode.CRYPT_SAME_SIZE) {
+				long partSize = validateAndParse(newStr);
+				if(partSize > 0 && partSize < data.get(rowIndex).getFileSize()) {
+					data.get(rowIndex).setParameters(partSize);
+				}
+				//Altrimenti non far niente
+			}
+			else if(mode == TaskMode.CUSTOM_NUMBER) {
+				try {
+					int nParts = Integer.parseInt(newStr);
+					if(nParts >= 1) {
+						data.get(rowIndex).setParameters(nParts);
+					}
+				}
+				catch(NumberFormatException e) {} //Do nothing
+			}
+			else if(mode == TaskMode.ZIP_CUSTOM_SIZE) {
+				//TODO DEFINIZIONE PARTI
+			}
 		}
 	 	fireTableRowsUpdated(rowIndex, rowIndex);
+	}
+
+	/**
+	 * @param newStr
+	 * @return specified size in bytes if validation succeeds, -1 otherwise
+	 */
+	private long validateAndParse(String newStr) {
+		if(newStr.matches("^[0-9]+[.]?[0-9]*(\\s[KMG]?B)?$")) {		//numero con possibili decimali e possibile unità
+			String[] splits = newStr.split("\\s");
+			double size = Double.parseDouble(splits[0]);	//parte col numero
+			if(splits.length > 1) {
+				switch(splits[1]) {		//switch sulla parte con l'unità di misura
+					case "B": return (long)size;
+					case "KB": return (long)(size *= 1000);
+					case "MB": return (long)(size *= 1000000);
+					case "GB": return (long)(size *= 1000000000);
+					default: return (long)size;
+				}
+			}
+			return (long)size;
+		}
+		else {
+			return -1;
+		}
 	}
 
 	@Override
@@ -58,7 +106,8 @@ public class FBTableModel extends AbstractTableModel {
 			switch(columnIndex) {
 				case 0:	return data.get(rowIndex).getName();
 				case 1:	return data.get(rowIndex).getMode();
-				case 2: return data.get(rowIndex).getSpecs();
+				case 2: return data.get(rowIndex).getParameters();
+				case 3: return data.get(rowIndex).getFileSizeFormatted();
 				default:	throw new ArrayIndexOutOfBoundsException();
 			}
 		}
@@ -101,15 +150,15 @@ public class FBTableModel extends AbstractTableModel {
 		return data;
 	}
 	
-	private FBTask createTask(String path, String name, TaskMode mode) {
+	private FBTask createTask(String path, String name, TaskMode mode, long fileSize) {
 		switch(mode) {
-			case SAME_SIZE:			return new FBTaskSameSize(path, name);
+			case SAME_SIZE:			return new FBTaskSameSize(path, name, fileSize);
 			
-			case CRYPT_SAME_SIZE:	return new FBTaskCryptSameSize(path, name);
+			case CRYPT_SAME_SIZE:	return new FBTaskCryptSameSize(path, name, fileSize);
 			
-			case ZIP_CUSTOM_SIZE:	return new FBTaskZipCustomSize(path, name);
+			case ZIP_CUSTOM_SIZE:	return new FBTaskZipCustomSize(path, name, fileSize);
 			
-			case CUSTOM_NUMBER:		return new FBTaskCustomNumber(path, name);
+			case CUSTOM_NUMBER:		return new FBTaskCustomNumber(path, name, fileSize);
 			
 			default:				return null;
 		}

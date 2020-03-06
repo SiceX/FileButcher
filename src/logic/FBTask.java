@@ -1,25 +1,25 @@
 package logic;
 
+import java.text.DecimalFormat;
+
 //import java.io.File;
 
 public abstract class FBTask {
 	//private File file;
 	private String pathname;
 	private String name;
+	private long fileSize;
 	private TaskMode mode;
 	
-	public FBTask(String path, String name, TaskMode tMode) {
+	public FBTask(String path, String name, TaskMode tMode, long fSize) {
 		setPathname(path);
 		setName(name);
 		setMode(tMode);
+		fileSize = fSize;
 	}
 	
-	public FBTask(String path, String name){
-		this(path, name, TaskMode.SAME_SIZE);
-	}
-	
-	public FBTask(){
-		this(null, null, TaskMode.SAME_SIZE);
+	public FBTask(String path, String name, long fileSize){
+		this(path, name, TaskMode.SAME_SIZE, fileSize);
 	}
 	
 	public TaskMode getMode() {
@@ -61,7 +61,30 @@ public abstract class FBTask {
 		this.name = name;
 	}
 	
-	public String getSpecs() {
+	public String getParameters() {
 		return null;
 	}
+	
+	public void setParameters(Object param) {}
+
+	public long getFileSize() {
+		return fileSize;
+	}
+
+	public String getFileSizeFormatted() {
+		DecimalFormat df = new DecimalFormat("#.##");
+		if(fileSize < 1000) {
+			return fileSize + " B";
+		}
+		else if(fileSize < 1000000) {
+			return df.format(((double)fileSize)/1000) + " KB";
+		}
+		else if(fileSize < 1000000000) {
+			return df.format(((double)fileSize)/1000000) + " MB";
+		}
+		else {
+			return df.format(((double)fileSize)/1000000000) + " GB";
+		}
+	}
+	
 }

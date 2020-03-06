@@ -13,6 +13,7 @@ import javax.swing.text.DocumentFilter;
  * @author nicola.ferrari
  *
  */
+@Deprecated
 public class PartSizeFilter extends DocumentFilter {
 
 	private double maxSize;
@@ -27,7 +28,8 @@ public class PartSizeFilter extends DocumentFilter {
     	//Match anche di numeri in via di scrittura (e.g: '54.'). In tal caso, il parse del numero fallisce, ma non lo
     	//reputo un errore: faccio il catch dell'eccezione e non faccio niente. 
     	//Se il parse ha successo, allora procedo con l'assicurarmi che il numero sia minore del massimo
-    	if( fb.getDocument().getText(0, fb.getDocument().getLength()).matches("^[0-9]+[.]?[0-9]*$") ) {
+    	//Voglio anche l'unità di misura
+    	if( fb.getDocument().getText(0, fb.getDocument().getLength()).matches("^[0-9]+[.]?[0-9]\\s[KMG]?B$") ) {
     		try {
     			double number = Double.parseDouble(fb.getDocument().getText(0, fb.getDocument().getLength()) + str);
     	
@@ -50,7 +52,8 @@ public class PartSizeFilter extends DocumentFilter {
     	//Match anche di numeri in via di scrittura (e.g: '54.'). In tal caso, il parse del numero fallisce, ma non lo
     	//reputo un errore: faccio il catch dell'eccezione e non faccio niente. 
     	//Se il parse ha successo, allora procedo con l'assicurarmi che il numero sia minore del massimo
-    	if( newStr.matches("^[0-9]+[.]?[0-9]*$") ) {
+    	//Voglio anche l'unità di misura
+    	if( newStr.matches("^[0-9]+[.]?[0-9]\\s[KMG]?B$") ) {
     		try {
     			double number = Double.parseDouble(newStr);
 	    	

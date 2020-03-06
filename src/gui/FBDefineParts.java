@@ -10,8 +10,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
-import logic.PartSizeFilter;
-
 import logic.Unit;
 
 import java.awt.event.ItemEvent;
@@ -28,7 +26,7 @@ public class FBDefineParts extends JDialog {
 	private JLabel lblSizeLeft;
 	private JTextField partSizeField;
 	//private NumberFormatter numberFormatter;
-	private PartSizeFilter partSizeFilter;
+	//private PartSizeFilter partSizeFilter;
 	private double remainingSize;
 	private double newPartSize;
 
@@ -57,14 +55,14 @@ public class FBDefineParts extends JDialog {
 		}
 		{
 			//Il massimo deve essere impostato in base all'unità di misura selezionata, che all'inizio è B(Byte)
-			partSizeFilter = new PartSizeFilter(remainingSize/1);
+			//partSizeFilter = new PartSizeFilter(remainingSize/1);
 			
 			partSizeField = new JTextField();
 			
 			Document doc = partSizeField.getDocument();
 			if (doc instanceof AbstractDocument) {
-			    AbstractDocument abDoc = (AbstractDocument)doc;
-			    abDoc.setDocumentFilter(partSizeFilter);
+			    //AbstractDocument abDoc = (AbstractDocument)doc;
+			    //abDoc.setDocumentFilter(partSizeFilter);
 			} 
 			
 			partSizeField.setColumns(10);
@@ -78,7 +76,7 @@ public class FBDefineParts extends JDialog {
 				public void itemStateChanged(ItemEvent arg0) {
 					if (arg0.getStateChange() == ItemEvent.SELECTED) {
 						//Il massimo deve essere impostato in base all'unità di misura selezionata
-						partSizeFilter.setMaxSize(remainingSize/getUnit());
+						//partSizeFilter.setMaxSize(remainingSize/getUnit());
 						//Quando viene cambiato il massimo, effettuo un replace con la stessa stringa. Se questa non passa il filtro, svuoto il campo.
 						partSizeField.setText(partSizeField.getText());
 						

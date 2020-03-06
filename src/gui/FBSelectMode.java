@@ -12,13 +12,10 @@ import logic.Unit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import net.miginfocom.swing.MigLayout;
-import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.beans.PropertyChangeEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.FocusAdapter;
@@ -55,9 +52,11 @@ public class FBSelectMode extends JDialog {
 			"Dimensione"
 		}
 	) {
+		@SuppressWarnings("rawtypes")
 		Class[] columnTypes = new Class[] {
 			Integer.class
 		};
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public Class getColumnClass(int columnIndex) {
 			return columnTypes[columnIndex];
 		}

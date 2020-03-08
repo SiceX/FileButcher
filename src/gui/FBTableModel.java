@@ -1,7 +1,14 @@
-package logic;
+package gui;
 
 import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
+
+import logic.FBTask;
+import logic.FBTaskCryptSameSize;
+import logic.FBTaskCustomNumber;
+import logic.FBTaskSameSize;
+import logic.FBTaskZipCustomSize;
+import logic.TaskMode;
 
 @SuppressWarnings("serial")
 public class FBTableModel extends AbstractTableModel {
@@ -78,9 +85,9 @@ public class FBTableModel extends AbstractTableModel {
 	 * @return specified size in bytes if validation succeeds, -1 otherwise
 	 */
 	private long validateAndParse(String newStr) {
-		if(newStr.matches("^[0-9]+[.]?[0-9]*(\\s[KMG]?B)?$")) {		//numero con possibili decimali e possibile unità
+		if(newStr.matches("^[0-9]+[.,]?[0-9]*(\\s[KMG]?B)?$")) {		//numero con possibili decimali e possibile unità
 			String[] splits = newStr.split("\\s");
-			double size = Double.parseDouble(splits[0]);	//parte col numero
+			double size = Double.parseDouble(splits[0].replaceAll(",", "."));	//parte col numero
 			if(splits.length > 1) {
 				switch(splits[1]) {		//switch sulla parte con l'unità di misura
 					case "B": return (long)size;

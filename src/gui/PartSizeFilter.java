@@ -1,7 +1,7 @@
 /**
  * 
  */
-package logic;
+package gui;
 
 import java.awt.Toolkit;
 

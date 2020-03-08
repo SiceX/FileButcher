@@ -27,7 +27,6 @@ public class FBTaskZipCustomSize extends FBTask {
 	@Override
 	public String getParameters() {
 		return partSpecs.size() + " parti";
-		//TODO
 	}
 	
 	@Override

@@ -25,7 +25,7 @@ public class FBMainWindow extends JFrame{
 	private final JButton btnButcher = new JButton("Esegui scomposizioni");
 	private final JButton btnRebuild = new JButton("Ricomponi file");
 	
-		
+	
 
 	public FBMainWindow() {
 		super();

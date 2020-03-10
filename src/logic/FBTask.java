@@ -4,22 +4,33 @@ import java.text.DecimalFormat;
 
 //import java.io.File;
 
-public abstract class FBTask {
+public abstract class FBTask extends Thread{
 	//private File file;
-	private String pathname;
-	private String name;
+	private String pathName;
+	private String fileName;
 	private long fileSize;
 	private TaskMode mode;
 	
 	public FBTask(String path, String name, TaskMode tMode, long fSize) {
-		setPathname(path);
-		setName(name);
+		setPathName(path);
+		setFileName(name);
 		setMode(tMode);
 		fileSize = fSize;
 	}
 	
+	/**
+	 * Crea un FBTask generico (default SAME_SIZE)
+	 * @param path indizirro del file
+	 * @param name nome del file
+	 * @param fileSize dimensione del file
+	 */
 	public FBTask(String path, String name, long fileSize){
 		this(path, name, TaskMode.SAME_SIZE, fileSize);
+	}
+	
+	@Override
+	public void run() {
+		
 	}
 	
 	public TaskMode getMode() {
@@ -45,20 +56,20 @@ public abstract class FBTask {
 		this.mode = type;
 	}
 
-	public String getPathname() {
-		return pathname;
+	public String getPathName() {
+		return pathName;
 	}
 
-	public void setPathname(String pathname) {
-		this.pathname = pathname;
+	public void setPathName(String pathname) {
+		this.pathName = pathname;
 	}
 
-	public String getName() {
-		return name;
+	public String getFileName() {
+		return fileName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setFileName(String name) {
+		this.fileName = name;
 	}
 	
 	public String getParameters() {

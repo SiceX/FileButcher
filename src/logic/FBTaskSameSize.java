@@ -17,8 +17,9 @@ public class FBTaskSameSize extends FBTask {
 		this(path, name, fileSize, 500);
 	}
 	
-	public void execute() {
-		
+	@Override
+	public void run() {
+		//TODO
 	}
 
 	/**

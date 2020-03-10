@@ -50,7 +50,7 @@ public class FBTableModel extends AbstractTableModel {
 	public void setValueAt(Object value, int rowIndex, int columnIndex) {
 		if(columnIndex == 1) {	//Modifica tipo di task
 			TaskMode mode = (TaskMode)value;
-			FBTask editedTask = createTask(data.get(rowIndex).getPathname(), data.get(rowIndex).getName(), mode, data.get(rowIndex).getFileSize());
+			FBTask editedTask = createTask(data.get(rowIndex).getPathName(), data.get(rowIndex).getFileName(), mode, data.get(rowIndex).getFileSize());
 			
 			data.set(rowIndex, editedTask);
 		}
@@ -108,7 +108,7 @@ public class FBTableModel extends AbstractTableModel {
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		if(rowIndex < data.size()) {
 			switch(columnIndex) {
-				case 0:	return data.get(rowIndex).getName();
+				case 0:	return data.get(rowIndex).getFileName();
 				case 1:	return data.get(rowIndex).getMode();
 				case 2: return data.get(rowIndex).getParameters();
 				case 3: return data.get(rowIndex).getFileSizeFormatted();

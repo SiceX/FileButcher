@@ -14,6 +14,11 @@ public class FBTaskCustomNumber extends FBTask {
 	public FBTaskCustomNumber(String path, String name, long fileSize){
 		this(path, name, fileSize, 2);
 	}
+	
+	@Override
+	public void run() {
+		//TODO
+	}
 
 	/**
 	 * @return the fileExtension

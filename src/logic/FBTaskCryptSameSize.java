@@ -17,6 +17,11 @@ public class FBTaskCryptSameSize extends FBTask {
 		this(path, name, fileSize, 500);
 	}
 
+	@Override
+	public void run() {
+		//TODO
+	}
+	
 	/**
 	 * @return the fileExtension
 	 */

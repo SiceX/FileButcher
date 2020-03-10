@@ -4,7 +4,6 @@
 package logic;
 
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * @author nicola.ferrari
@@ -12,10 +11,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public final class Butcher {
 	
-	private static ConcurrentLinkedQueue<FBTask> tasks;
-	
-	public static void executeOrder66(ArrayList<FBTask> data) {
-		tasks = new ConcurrentLinkedQueue<FBTask>(data);
+	public static void executeOrder66(ArrayList<FBTask> tasks) {
+		for(int i=0; i<tasks.size(); i++) {
+			tasks.get(i).start();
+		}
 	}
 	
 }

@@ -16,6 +16,11 @@ public class FBTaskZipCustomSize extends FBTask {
 	public FBTaskZipCustomSize(String path, String name, long fileSize){
 		this(path, name, fileSize, new ArrayList<Integer>() {});
 	}
+	
+	@Override
+	public void run() {
+		//TODO
+	}
 
 	/**
 	 * @return the fileExtension

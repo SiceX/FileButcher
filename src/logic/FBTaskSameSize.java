@@ -17,8 +17,14 @@ public class FBTaskSameSize extends FBTask {
 		this(path, name, fileSize, 500);
 	}
 	
+	/**
+	 * Esecuzione della divisione in parti uguali
+	 */
 	@Override
 	public void run() {
+		
+		
+		
 		//TODO
 	}
 

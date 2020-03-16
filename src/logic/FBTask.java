@@ -28,6 +28,9 @@ public abstract class FBTask extends Thread{
 		this(path, name, TaskMode.SAME_SIZE, fileSize);
 	}
 	
+	/**
+	 * L'esecuzione del task
+	 */
 	@Override
 	public void run() {
 		

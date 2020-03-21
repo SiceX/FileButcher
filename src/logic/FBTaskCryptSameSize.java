@@ -4,7 +4,6 @@ import java.text.DecimalFormat;
 
 public class FBTaskCryptSameSize extends FBTask {
 	
-	private final String fileExtension = ".crypar";
 	private long partSize;
 	
 	public FBTaskCryptSameSize(String path, String name, long fileSize, long pSize){
@@ -20,13 +19,6 @@ public class FBTaskCryptSameSize extends FBTask {
 	@Override
 	public void run() {
 		//TODO
-	}
-	
-	/**
-	 * @return the fileExtension
-	 */
-	public String getFileExtension() {
-		return fileExtension;
 	}
 	
 	@Override

@@ -3,7 +3,6 @@ import java.util.ArrayList;
 
 public class FBTaskZipCustomSize extends FBTask {
 	
-	private final String fileExtension = ".zipar";
 	private ArrayList<Integer> partSpecs;
 	
 	public FBTaskZipCustomSize(String path, String name, long fileSize, ArrayList<Integer> specs){
@@ -20,13 +19,6 @@ public class FBTaskZipCustomSize extends FBTask {
 	@Override
 	public void run() {
 		//TODO
-	}
-
-	/**
-	 * @return the fileExtension
-	 */
-	public String getFileExtension() {
-		return fileExtension;
 	}
 
 	@Override

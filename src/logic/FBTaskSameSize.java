@@ -1,10 +1,17 @@
 package logic;
 
+import java.awt.Desktop;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DecimalFormat;
 
 public class FBTaskSameSize extends FBTask {
 	
-	private final String fileExtension = ".par";
 	private long partSize;
 	
 	public FBTaskSameSize(String path, String name, long fileSize, long pSize){
@@ -22,17 +29,33 @@ public class FBTaskSameSize extends FBTask {
 	 */
 	@Override
 	public void run() {
+		try {
+			int fileCount = 1;
+			long currentSize = 0;
+			int bt;
+			InputStream iStream = new BufferedInputStream(new FileInputStream(getPathName()));
+			OutputStream oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", getResultDirectory()+getFileName(), fileCount, getFileExtension())));
+						
+			while((bt = iStream.read()) != -1) {
+				if(currentSize >= partSize) {
+					oStream.close();
+					fileCount++;
+					currentSize = 0;
+					oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", getResultDirectory()+getFileName(), fileCount, getFileExtension())));
+				}
+				oStream.write(bt);
+				currentSize++;
+			}
+			
+			iStream.close();
+			oStream.close();
+			Desktop.getDesktop().open(new File(getResultDirectory()));
 		
+		}
+		catch(Throwable e) {
+			//throw e;
+		}
 		
-		
-		//TODO
-	}
-
-	/**
-	 * @return the fileExtension
-	 */
-	public String getFileExtension() {
-		return fileExtension;
 	}
 	
 	@Override

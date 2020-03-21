@@ -2,10 +2,13 @@ package logic;
 
 import java.text.DecimalFormat;
 
+import javax.swing.filechooser.FileSystemView;
+
 //import java.io.File;
 
 public abstract class FBTask extends Thread{
 	//private File file;
+	private final String resultDirectory = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\Splitted Files\\";
 	private String pathName;
 	private String fileName;
 	private long fileSize;
@@ -99,6 +102,25 @@ public abstract class FBTask extends Thread{
 		else {
 			return df.format(((double)fileSize)/1000000000) + " GB";
 		}
+	}
+	
+	public String getFileExtension() {
+		switch(mode) {
+		case SAME_SIZE:
+			return ".par";
+		case CRYPT_SAME_SIZE:
+			return ".crypar";
+		case ZIP_CUSTOM_SIZE:
+			return ".parn";
+		case CUSTOM_NUMBER:
+			return ".zipar";
+		default:
+			throw new NullPointerException();
+		}
+	}
+
+	public String getResultDirectory() {
+		return resultDirectory;
 	}
 	
 }

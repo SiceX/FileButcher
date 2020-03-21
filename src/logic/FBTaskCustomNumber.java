@@ -2,7 +2,6 @@ package logic;
 
 public class FBTaskCustomNumber extends FBTask {
 	
-	private final String fileExtension = ".parn";
 	private int numberOfParts;
 
 	public FBTaskCustomNumber(String path, String name, long fileSize, int nParts){
@@ -18,13 +17,6 @@ public class FBTaskCustomNumber extends FBTask {
 	@Override
 	public void run() {
 		//TODO
-	}
-
-	/**
-	 * @return the fileExtension
-	 */
-	public String getFileExtension() {
-		return fileExtension;
 	}
 
 	@Override

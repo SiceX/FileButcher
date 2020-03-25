@@ -24,15 +24,20 @@ public class FBMainWindow extends JFrame{
 	private final JButton btnRemoveSelected = new JButton("Rimuovi selezionati");
 	private final JButton btnButcher = new JButton("Esegui scomposizioni");
 	private final JButton btnRebuild = new JButton("Ricomponi file");
+	private final JPanel passwordPanel = new JPanel();
+	private final JPasswordField cryptKeyField = new JPasswordField();
+	private final JLabel lblCryptKeyField = new JLabel("Password");
 	
 	
 
 	public FBMainWindow() {
 		super();
+		lblCryptKeyField.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCryptKeyField.setLabelFor(cryptKeyField);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("FileButcher");
 		setSize(600, 300);
-		getContentPane().setLayout(new MigLayout("", "[154.00px,left][45.00][111.00px,grow]", "[212px,grow]"));
+		getContentPane().setLayout(new MigLayout("", "[::145px,grow][45.00,center][111.00px,grow]", "[212px][grow]"));
 		panel.setBorder(null);
 		
 		fileChooser.setMultiSelectionEnabled(true);
@@ -53,6 +58,7 @@ public class FBMainWindow extends JFrame{
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				FBTableModel model = (FBTableModel)tblQueue.getModel();
+				model.setCryptKey(cryptKeyField.getPassword());
 				Butcher.executeOrder66(model.getData());
 			}
 		});
@@ -88,7 +94,7 @@ public class FBMainWindow extends JFrame{
 		});
 		
 		JScrollPane scrollPane = new JScrollPane();
-		getContentPane().add(scrollPane, "cell 2 0,grow");
+		getContentPane().add(scrollPane, "cell 2 0 1 2,grow");
 		tblQueue.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent arg0) {
@@ -101,6 +107,14 @@ public class FBMainWindow extends JFrame{
 		scrollPane.setViewportView(tblQueue);
 		
 		tblQueue.setModel(new FBTableModel());
+		
+		getContentPane().add(passwordPanel, "cell 0 1,growx,aligny center");
+		passwordPanel.setLayout(new GridLayout(2, 0, 0, 3));
+		
+		passwordPanel.add(lblCryptKeyField);
+		cryptKeyField.setToolTipText("Chiave usata per la crittazione");
+		
+		passwordPanel.add(cryptKeyField);
 		tblQueue.getColumnModel().getColumn(0).setPreferredWidth(92);
 		JComboBox cmbxCellEditor = new JComboBox(TaskMode.values());
 		DefaultCellEditor editor = new DefaultCellEditor(cmbxCellEditor);

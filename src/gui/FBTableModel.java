@@ -146,6 +146,19 @@ public class FBTableModel extends AbstractTableModel {
 			removeTask(data.get(selection[i]));
 		}
 	}
+	
+	/**
+	 * Se ci sono dei task che richiedono la crittazione, ne imposta la chiave di crittazione
+	 * @param cryptKey chiave di crittazione, password
+	 */
+	public void setCryptKey(char[] cryptKey) {
+		for(int i=0; i<data.size(); i++) {
+			if(data.get(i).getMode() == TaskMode.CRYPT_SAME_SIZE) {
+				FBTaskCryptSameSize task = (FBTaskCryptSameSize)data.get(i);
+				task.setCryptKey(cryptKey);
+			}
+		}
+	}
 
 	/**
 	 * @return the data

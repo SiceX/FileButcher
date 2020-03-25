@@ -54,6 +54,7 @@ public class FBTaskSameSize extends FBTask {
 		}
 		catch(Throwable e) {
 			//throw e;
+			//TODO
 		}
 		
 	}

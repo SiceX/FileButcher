@@ -85,11 +85,11 @@ public class FBTableModel extends AbstractTableModel {
 	 * @return specified size in bytes if validation succeeds, -1 otherwise
 	 */
 	private long validateAndParse(String newStr) {
-		if(newStr.matches("^[0-9]+[.,]?[0-9]*(\\s[KMG]?B)?$")) {		//numero con possibili decimali e possibile unità
+		if(newStr.matches("^[0-9]+[.,]?[0-9]*(\\s[KMGkmg]?[Bb])?$")) {		//numero con possibili decimali e possibile unità
 			String[] splits = newStr.split("\\s");
 			double size = Double.parseDouble(splits[0].replaceAll(",", "."));	//parte col numero
 			if(splits.length > 1) {
-				switch(splits[1]) {		//switch sulla parte con l'unità di misura
+				switch(splits[1].toUpperCase()) {		//switch sulla parte con l'unità di misura
 					case "B": return (long)size;
 					case "KB": return (long)(size *= 1000);
 					case "MB": return (long)(size *= 1000000);
@@ -151,11 +151,11 @@ public class FBTableModel extends AbstractTableModel {
 	 * Se ci sono dei task che richiedono la crittazione, ne imposta la chiave di crittazione
 	 * @param cryptKey chiave di crittazione, password
 	 */
-	public void setCryptKey(char[] cryptKey) {
+	public void setPassword(char[] charKey) {
 		for(int i=0; i<data.size(); i++) {
 			if(data.get(i).getMode() == TaskMode.CRYPT_SAME_SIZE) {
 				FBTaskCryptSameSize task = (FBTaskCryptSameSize)data.get(i);
-				task.setCryptKey(cryptKey);
+				task.setPassword(new String(charKey));
 			}
 		}
 	}

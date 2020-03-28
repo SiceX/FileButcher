@@ -58,7 +58,7 @@ public class FBMainWindow extends JFrame{
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				FBTableModel model = (FBTableModel)tblQueue.getModel();
-				model.setCryptKey(cryptKeyField.getPassword());
+				model.setPassword(cryptKeyField.getPassword());
 				Butcher.executeOrder66(model.getData());
 			}
 		});
@@ -75,19 +75,10 @@ public class FBMainWindow extends JFrame{
 					File[] files = fileChooser.getSelectedFiles();
 					
 					for(int i=0; i<files.length; i++) {
-						//FBSelectMode dialog = new FBSelectMode(mainWindowReference, files[i]);
-						//dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-						
-						//dialog.setVisible(true);
-						
-						//TaskMode choice = dialog.getChoice();
-						
-						//if(choice != null) {
 						FBTask newTask = createTask(files[i].getPath(), files[i].getName(), files[i].length());
 						
 						FBTableModel model = (FBTableModel) tblQueue.getModel();
 					    model.addTask(newTask);
-						//}
 					}
 				}
 			}

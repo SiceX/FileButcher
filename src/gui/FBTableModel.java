@@ -59,10 +59,14 @@ public class FBTableModel extends AbstractTableModel {
 			TaskMode mode = data.get(rowIndex).getMode();
 			if(mode == TaskMode.SAME_SIZE || mode == TaskMode.CRYPT_SAME_SIZE) {
 				long partSize = validateAndParse(newStr);
-				if(partSize > 0 && partSize < data.get(rowIndex).getFileSize()) {
-					data.get(rowIndex).setParameters(partSize);
+				if(partSize > 0) {
+					if( partSize <= data.get(rowIndex).getFileSize() ) {
+						data.get(rowIndex).setParameters(partSize);
+					}
+					else {
+						data.get(rowIndex).setParameters(data.get(rowIndex).getFileSize());
+					}
 				}
-				//Altrimenti non far niente
 			}
 			else if(mode == TaskMode.CUSTOM_NUMBER) {
 				try {

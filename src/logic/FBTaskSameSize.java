@@ -8,7 +8,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.MessageDigest;
 import java.text.DecimalFormat;
+import java.util.Arrays;
+
+import javax.crypto.Cipher;
+import javax.crypto.CipherOutputStream;
+import javax.crypto.spec.SecretKeySpec;
 
 public class FBTaskSameSize extends FBTask {
 	
@@ -31,25 +37,39 @@ public class FBTaskSameSize extends FBTask {
 	public void run() {
 		try {
 			int fileCount = 1;
-			long currentSize = 0;
-			int bt;
+			long currentPartSize = 0;
+			long bytesRead = 0;
+			
 			InputStream iStream = new BufferedInputStream(new FileInputStream(getPathName()));
-			OutputStream oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", getResultDirectory()+getFileName(), fileCount, getFileExtension())));
-						
-			while((bt = iStream.read()) != -1) {
-				if(currentSize >= partSize) {
-					oStream.close();
-					fileCount++;
-					currentSize = 0;
-					oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", getResultDirectory()+getFileName(), fileCount, getFileExtension())));
+			BufferedOutputStream coStream;
+			
+			do {
+ 				coStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension())));
+				long remainingBytes = getFileSize() - bytesRead;
+ 				currentPartSize = ( partSize < remainingBytes ) ? partSize : remainingBytes;
+				
+				while(currentPartSize > BLOCK_MAX_SIZE) {
+					byte[] bytes = new byte[BLOCK_MAX_SIZE];
+					iStream.read(bytes, 0, BLOCK_MAX_SIZE);
+					coStream.write(bytes);
+					coStream.close();
+					coStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension()), true));
+					currentPartSize -= BLOCK_MAX_SIZE;
+					bytesRead += BLOCK_MAX_SIZE;
 				}
-				oStream.write(bt);
-				currentSize++;
-			}
+				
+				byte[] bytes = new byte[(int)currentPartSize];
+				iStream.read(bytes, 0, (int)currentPartSize);
+				
+				coStream.write(bytes);
+				coStream.close();
+				fileCount++;
+				bytesRead += currentPartSize;
+				
+			}while(iStream.available() > 0);
 			
 			iStream.close();
-			oStream.close();
-			Desktop.getDesktop().open(new File(getResultDirectory()));
+			Desktop.getDesktop().open(new File(RESULT_DIR));
 		
 		}
 		catch(Throwable e) {

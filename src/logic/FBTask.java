@@ -8,7 +8,8 @@ import javax.swing.filechooser.FileSystemView;
 
 public abstract class FBTask extends Thread{
 	//private File file;
-	private final String resultDirectory = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\Splitted Files\\";
+	public static final String RESULT_DIR = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\Splitted Files\\";
+	protected static final int BLOCK_MAX_SIZE = 50000000;
 	private String pathName;
 	private String fileName;
 	private long fileSize;
@@ -117,10 +118,6 @@ public abstract class FBTask extends Thread{
 		default:
 			throw new NullPointerException();
 		}
-	}
-
-	public String getResultDirectory() {
-		return resultDirectory;
 	}
 	
 }

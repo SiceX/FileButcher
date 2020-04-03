@@ -14,6 +14,7 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 
 import javax.crypto.Cipher;
+import javax.crypto.CipherOutputStream;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -39,11 +40,20 @@ public class FBTaskCryptSameSize extends FBTask {
 	public void run() {
 		try {
 			int fileCount = 1;
-			long currentSize = 0;
-			byte[] bytes = new byte[(int)partSize];
+			long currentPartSize = 0;
+			long bytesRead = 0;
+			
+			byte[] key = password.getBytes("UTF-8");
+		    MessageDigest sha = MessageDigest.getInstance("SHA-1");
+		    key = sha.digest(key);
+		    key = Arrays.copyOf(key, 16); // use only first 128 bit
+
+		    SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
+		    Cipher cipher = Cipher.getInstance("AES");
+		    cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
 			
 			InputStream iStream = new BufferedInputStream(new FileInputStream(getPathName()));
-			OutputStream oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", getResultDirectory()+getFileName(), fileCount, getFileExtension())));
+			CipherOutputStream coStream;
 			
 //			SecureRandom sr = SecureRandom.getInstanceStrong();
 //		    byte[] salt = new byte[16];
@@ -56,33 +66,42 @@ public class FBTaskCryptSameSize extends FBTask {
 //		    SecretKey key = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(spec);
 //		    Cipher cipher = Cipher.getInstance("AES");
 //		    cipher.init(Cipher.ENCRYPT_MODE, key);
-						
-		    
-		    
-		    byte[] key = password.getBytes("UTF-8");
-		    MessageDigest sha = MessageDigest.getInstance("SHA-1");
-		    key = sha.digest(key);
-		    key = Arrays.copyOf(key, 16); // use only first 128 bit
-
-		    SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
-		    Cipher cipher = Cipher.getInstance("AES");
-		    cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
-		    
-		    
-			while(iStream.read(bytes, 0, (int)partSize) != -1) {
-				if(currentSize >= partSize) {
-					oStream.close();
-					fileCount++;
-					currentSize = 0;
-					oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", getResultDirectory()+getFileName(), fileCount, getFileExtension())));
+		    		    
+//			while(iStream.read(bytes, 0, (int)partSize) != -1) {
+//				coStream.write(bytes);
+//				coStream.close();
+//				fileCount++;
+//
+//				coStream = new CipherOutputStream(new FileOutputStream(String.format("%s.%d%s", getResultDirectory()+getFileName(), fileCount, getFileExtension())), cipher);
+//			}
+			
+			do {
+ 				coStream = new CipherOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension())), cipher);
+				long remainingBytes = getFileSize() - bytesRead;
+ 				currentPartSize = ( partSize < remainingBytes ) ? partSize : remainingBytes;
+				
+				while(currentPartSize > BLOCK_MAX_SIZE) {
+					byte[] bytes = new byte[BLOCK_MAX_SIZE];
+					iStream.read(bytes, 0, BLOCK_MAX_SIZE);
+					coStream.write(bytes);
+					coStream.close();
+					coStream = new CipherOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension()), true), cipher);
+					currentPartSize -= BLOCK_MAX_SIZE;
+					bytesRead += BLOCK_MAX_SIZE;
 				}
-				oStream.write(cipher.doFinal(bytes));
-				currentSize += partSize;
-			}
+				
+				byte[] bytes = new byte[(int)currentPartSize];
+				iStream.read(bytes, 0, (int)currentPartSize);
+				
+				coStream.write(bytes);
+				coStream.close();
+				fileCount++;
+				bytesRead += currentPartSize;
+				
+			}while(iStream.available() > 0);
 			
 			iStream.close();
-			oStream.close();
-			Desktop.getDesktop().open(new File(getResultDirectory()));
+			Desktop.getDesktop().open(new File(RESULT_DIR));
 		
 		}
 		catch(Throwable e) {

@@ -7,14 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.MessageDigest;
 import java.text.DecimalFormat;
-import java.util.Arrays;
-
-import javax.crypto.Cipher;
-import javax.crypto.CipherOutputStream;
-import javax.crypto.spec.SecretKeySpec;
 
 public class FBTaskSameSize extends FBTask {
 	
@@ -41,19 +34,19 @@ public class FBTaskSameSize extends FBTask {
 			long bytesRead = 0;
 			
 			InputStream iStream = new BufferedInputStream(new FileInputStream(getPathName()));
-			BufferedOutputStream coStream;
+			BufferedOutputStream oStream;
 			
 			do {
- 				coStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension())));
+ 				oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension())));
 				long remainingBytes = getFileSize() - bytesRead;
  				currentPartSize = ( partSize < remainingBytes ) ? partSize : remainingBytes;
 				
 				while(currentPartSize > BLOCK_MAX_SIZE) {
 					byte[] bytes = new byte[BLOCK_MAX_SIZE];
 					iStream.read(bytes, 0, BLOCK_MAX_SIZE);
-					coStream.write(bytes);
-					coStream.close();
-					coStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension()), true));
+					oStream.write(bytes);
+					oStream.close();
+					oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension()), true));
 					currentPartSize -= BLOCK_MAX_SIZE;
 					bytesRead += BLOCK_MAX_SIZE;
 				}
@@ -61,8 +54,8 @@ public class FBTaskSameSize extends FBTask {
 				byte[] bytes = new byte[(int)currentPartSize];
 				iStream.read(bytes, 0, (int)currentPartSize);
 				
-				coStream.write(bytes);
-				coStream.close();
+				oStream.write(bytes);
+				oStream.close();
 				fileCount++;
 				bytesRead += currentPartSize;
 				

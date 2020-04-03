@@ -112,9 +112,9 @@ public abstract class FBTask extends Thread{
 		case CRYPT_SAME_SIZE:
 			return ".crypar";
 		case ZIP_CUSTOM_SIZE:
-			return ".parn";
-		case CUSTOM_NUMBER:
 			return ".zipar";
+		case CUSTOM_NUMBER:
+			return ".parn";
 		default:
 			throw new NullPointerException();
 		}

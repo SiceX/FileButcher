@@ -1,7 +1,11 @@
 package gui;
 
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
+
 import javax.swing.table.AbstractTableModel;
+import javax.swing.JProgressBar;
 
 import logic.FBTask;
 import logic.FBTaskCryptSameSize;
@@ -11,9 +15,9 @@ import logic.FBTaskZipCustomSize;
 import logic.TaskMode;
 
 @SuppressWarnings("serial")
-public class FBTableModel extends AbstractTableModel {
+public class FBTableModel extends AbstractTableModel implements Observer{
 	
-	private final String[] columnNames = {"File", "Modalità", "Parametri", "Dimensione"};
+	private final String[] columnNames = {"File", "Modalità", "Parametri", "Dimensione", "Progresso"};
 	private final ArrayList<FBTask> data = new ArrayList<FBTask>();
 	
 	public FBTableModel() {
@@ -32,6 +36,7 @@ public class FBTableModel extends AbstractTableModel {
 			case 1:	return String.class;
 			case 2: return String.class;
 			case 3: return String.class;
+			case 4: return JProgressBar.class;
 			default:	throw new ArrayIndexOutOfBoundsException();
 		}
 	}
@@ -53,6 +58,7 @@ public class FBTableModel extends AbstractTableModel {
 			FBTask editedTask = createTask(data.get(rowIndex).getPathName(), data.get(rowIndex).getFileName(), mode, data.get(rowIndex).getFileSize());
 			
 			data.set(rowIndex, editedTask);
+			editedTask.addObserver(this);
 		}
 		else if(columnIndex == 2) { //Modifica parametri del task
 			String newStr = (String)value;
@@ -111,11 +117,14 @@ public class FBTableModel extends AbstractTableModel {
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		if(rowIndex < data.size()) {
+			FBTask task = data.get(rowIndex);
 			switch(columnIndex) {
-				case 0:	return data.get(rowIndex).getFileName();
-				case 1:	return data.get(rowIndex).getMode();
-				case 2: return data.get(rowIndex).getParameters();
-				case 3: return data.get(rowIndex).getFileSizeFormatted();
+				case 0:		return task.getFileName();
+				case 1:		return task.getMode();
+				case 2: 	return task.getParameters();
+				case 3: 	return task.getFileSizeFormatted();
+				case 4: 	double progress = ((double)task.getProcessed() / task.getFileSize()) * 100;
+							return progress;
 				default:	throw new ArrayIndexOutOfBoundsException();
 			}
 		}
@@ -134,6 +143,7 @@ public class FBTableModel extends AbstractTableModel {
 	
 	public void addTask(FBTask task) {
 		data.add(task);
+		task.addObserver(this);
 		fireTableRowsInserted(data.size(), data.size());
 	}
 	
@@ -182,6 +192,14 @@ public class FBTableModel extends AbstractTableModel {
 			case CUSTOM_NUMBER:		return new FBTaskCustomNumber(path, name, fileSize);
 			
 			default:				return null;
+		}
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		int index = data.indexOf(arg);
+		if(index != -1) {
+			fireTableRowsUpdated(index, index);
 		}
 	}
 

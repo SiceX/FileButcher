@@ -1,9 +1,7 @@
 package logic;
 
-import java.awt.Desktop;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -15,12 +13,12 @@ public class FBTaskSameSize extends FBTask {
 	
 	public FBTaskSameSize(String path, String name, long fileSize, long pSize){
 		super(path, name, TaskMode.SAME_SIZE, fileSize);
-		partSize = pSize;
+		partSize = pSize < fileSize ? pSize : fileSize;
 	}
 	
 	//Default
 	public FBTaskSameSize(String path, String name, long fileSize) {
-		this(path, name, fileSize, 500);
+		this(path, name, fileSize, 100*1000);
 	}
 	
 	/**
@@ -31,14 +29,14 @@ public class FBTaskSameSize extends FBTask {
 		try {
 			int fileCount = 1;
 			long currentPartSize = 0;
-			long bytesRead = 0;
+			processed = 0;
 			
 			InputStream iStream = new BufferedInputStream(new FileInputStream(getPathName()));
 			BufferedOutputStream oStream;
 			
 			do {
  				oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension())));
-				long remainingBytes = getFileSize() - bytesRead;
+				long remainingBytes = getFileSize() - processed;
  				currentPartSize = ( partSize < remainingBytes ) ? partSize : remainingBytes;
 				
 				while(currentPartSize > BLOCK_MAX_SIZE) {
@@ -48,7 +46,7 @@ public class FBTaskSameSize extends FBTask {
 					oStream.close();
 					oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension()), true));
 					currentPartSize -= BLOCK_MAX_SIZE;
-					bytesRead += BLOCK_MAX_SIZE;
+					setProcessed(processed + BLOCK_MAX_SIZE);
 				}
 				
 				byte[] bytes = new byte[(int)currentPartSize];
@@ -57,13 +55,11 @@ public class FBTaskSameSize extends FBTask {
 				oStream.write(bytes);
 				oStream.close();
 				fileCount++;
-				bytesRead += currentPartSize;
+				setProcessed(processed + currentPartSize);
 				
 			}while(iStream.available() > 0);
 			
 			iStream.close();
-			Desktop.getDesktop().open(new File(RESULT_DIR));
-		
 		}
 		catch(Throwable e) {
 			//throw e;

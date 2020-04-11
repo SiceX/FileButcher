@@ -1,8 +1,6 @@
 package logic;
 
-import java.awt.Desktop;
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -21,12 +19,12 @@ public class FBTaskCryptSameSize extends FBTask {
 	
 	public FBTaskCryptSameSize(String path, String name, long fileSize, long pSize){
 		super(path, name, TaskMode.CRYPT_SAME_SIZE, fileSize);
-		partSize = pSize;
+		partSize = pSize < fileSize ? pSize : fileSize;
 	}
 	
 	//Default
 	public FBTaskCryptSameSize(String path, String name, long fileSize) {
-		this(path, name, fileSize, 500);
+		this(path, name, fileSize, 100*1000);
 	}
 
 	@Override
@@ -34,7 +32,7 @@ public class FBTaskCryptSameSize extends FBTask {
 		try {
 			int fileCount = 1;
 			long currentPartSize = 0;
-			long bytesRead = 0;
+			processed = 0;
 			
 			byte[] key = password.getBytes("UTF-8");
 		    MessageDigest sha = MessageDigest.getInstance("SHA-1");
@@ -70,7 +68,7 @@ public class FBTaskCryptSameSize extends FBTask {
 			
 			do {
  				coStream = new CipherOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension())), cipher);
-				long remainingBytes = getFileSize() - bytesRead;
+				long remainingBytes = getFileSize() - processed;
  				currentPartSize = ( partSize < remainingBytes ) ? partSize : remainingBytes;
 				
 				while(currentPartSize > BLOCK_MAX_SIZE) {
@@ -80,7 +78,7 @@ public class FBTaskCryptSameSize extends FBTask {
 					coStream.close();
 					coStream = new CipherOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension()), true), cipher);
 					currentPartSize -= BLOCK_MAX_SIZE;
-					bytesRead += BLOCK_MAX_SIZE;
+					setProcessed(processed + BLOCK_MAX_SIZE);
 				}
 				
 				byte[] bytes = new byte[(int)currentPartSize];
@@ -89,13 +87,11 @@ public class FBTaskCryptSameSize extends FBTask {
 				coStream.write(bytes);
 				coStream.close();
 				fileCount++;
-				bytesRead += currentPartSize;
+				setProcessed(processed + currentPartSize);
 				
 			}while(iStream.available() > 0);
 			
-			iStream.close();
-			Desktop.getDesktop().open(new File(RESULT_DIR));
-		
+			iStream.close();		
 		}
 		catch(Throwable e) {
 			System.err.println(e.getMessage());

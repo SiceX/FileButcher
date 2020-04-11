@@ -1,18 +1,20 @@
 package logic;
 
 import java.text.DecimalFormat;
+import java.util.Observable;
 
 import javax.swing.filechooser.FileSystemView;
 
 //import java.io.File;
 
-public abstract class FBTask extends Thread{
+public abstract class FBTask extends Observable implements Runnable{
 	//private File file;
 	public static final String RESULT_DIR = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\Splitted Files\\";
 	protected static final int BLOCK_MAX_SIZE = 50000000;
 	private String pathName;
 	private String fileName;
 	private long fileSize;
+	protected long processed;
 	private TaskMode mode;
 	
 	public FBTask(String path, String name, TaskMode tMode, long fSize) {
@@ -20,6 +22,7 @@ public abstract class FBTask extends Thread{
 		setFileName(name);
 		setMode(tMode);
 		fileSize = fSize;
+		processed = 0;
 	}
 	
 	/**
@@ -87,6 +90,16 @@ public abstract class FBTask extends Thread{
 
 	public long getFileSize() {
 		return fileSize;
+	}
+
+	public long getProcessed() {
+		return processed;
+	}
+	
+	protected void setProcessed(long proc) {
+		processed = proc;
+		setChanged();
+		notifyObservers(this); 
 	}
 
 	public String getFileSizeFormatted() {

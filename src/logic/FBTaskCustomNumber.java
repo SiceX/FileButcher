@@ -1,9 +1,7 @@
 package logic;
 
-import java.awt.Desktop;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -28,6 +26,7 @@ public class FBTaskCustomNumber extends FBTask {
 			long partSize = getFileSize()/numberOfParts;
 			long carryBytes = getFileSize()-(partSize*numberOfParts);
 			long currentPartSize = 0;
+			processed = 0;
 			
 			InputStream iStream = new BufferedInputStream(new FileInputStream(getPathName()));
 			BufferedOutputStream oStream;
@@ -44,6 +43,7 @@ public class FBTaskCustomNumber extends FBTask {
 					oStream.close();
 					oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), i+1, getFileExtension()), true));
 					currentPartSize -= BLOCK_MAX_SIZE;
+					setProcessed(processed + BLOCK_MAX_SIZE);
 				}
 				
 				byte[] bytes = new byte[(int)currentPartSize];
@@ -51,11 +51,10 @@ public class FBTaskCustomNumber extends FBTask {
 				
 				oStream.write(bytes);
 				oStream.close();
+				setProcessed(processed + currentPartSize);
 			}
 			
 			iStream.close();
-			Desktop.getDesktop().open(new File(RESULT_DIR));
-		
 		}
 		catch(Throwable e) {
 			//throw e;

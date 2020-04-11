@@ -1,12 +1,14 @@
 package gui;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
 
 import logic.*;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -16,6 +18,7 @@ public class FBMainWindow extends JFrame{
 	 * "F:\\Event\\Download" per Event,
 	 * System.getenv("HOMEPATH") + "\\Download" per altri pc
 	 */
+	public static final String RESULT_DIR = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\Splitted Files\\";
 	private final JFileChooser fileChooser = new JFileChooser("F:\\Event\\Download");
 	private final JTable tblQueue = new JTable();
 	private final JButton btnChooseFile = new JButton("Seleziona file(s)");
@@ -27,6 +30,7 @@ public class FBMainWindow extends JFrame{
 	private final JPanel passwordPanel = new JPanel();
 	private final JPasswordField cryptKeyField = new JPasswordField();
 	private final JLabel lblCryptKeyField = new JLabel("Password");
+	private final JButton btnOpenResDirectory = new JButton("Apri cartella risultati");
 	
 	
 
@@ -66,6 +70,19 @@ public class FBMainWindow extends JFrame{
 		panel.add(btnButcher);
 		
 		panel.add(btnRebuild);
+		
+		btnOpenResDirectory.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				try {
+					Desktop.getDesktop().open(new File(RESULT_DIR));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		
+		panel.add(btnOpenResDirectory);
 		
 		btnChooseFile.addMouseListener(new MouseAdapter() {
 			@Override
@@ -110,11 +127,15 @@ public class FBMainWindow extends JFrame{
 		JComboBox cmbxCellEditor = new JComboBox(TaskMode.values());
 		DefaultCellEditor editor = new DefaultCellEditor(cmbxCellEditor);
 		tblQueue.getColumnModel().getColumn(1).setCellEditor(editor);
+		
+		ProgressBarRenderer pbr = new ProgressBarRenderer(0, 100);
+		pbr.setStringPainted(true);
+		tblQueue.setDefaultRenderer(JProgressBar.class, pbr);
 				
 	}
 	
 	private FBTask createTask(String path, String name, long fileSize) {
-		return new FBTaskSameSize(path, name, fileSize, 50);
+		return new FBTaskSameSize(path, name, fileSize, 100*1000);
 	}
 	
 //	private FBTask createTask(String path, String name, FBSelectMode dialog) {

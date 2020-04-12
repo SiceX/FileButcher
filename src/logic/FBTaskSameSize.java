@@ -3,22 +3,40 @@ package logic;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.MessageDigest;
 import java.text.DecimalFormat;
+import java.util.Arrays;
+
+import javax.crypto.Cipher;
+import javax.crypto.CipherOutputStream;
+import javax.crypto.spec.SecretKeySpec;
 
 public class FBTaskSameSize extends FBTask {
 	
 	private long partSize;
+	private boolean doCrypt;
+	private Cipher cipher;
 	
-	public FBTaskSameSize(String path, String name, long fileSize, long pSize){
-		super(path, name, TaskMode.SAME_SIZE, fileSize);
+	public FBTaskSameSize(String path, String name, long fileSize, long pSize, boolean crypt){
+		super(path, name, crypt ? TaskMode.CRYPT_SAME_SIZE : TaskMode.SAME_SIZE, fileSize);
 		partSize = pSize < fileSize ? pSize : fileSize;
+		doCrypt = crypt;
+	}
+
+	/** Default Crypt
+	 */
+	public FBTaskSameSize(String path, String name, long fileSize, boolean crypt) {
+		this(path, name, fileSize, 100*1000, crypt);
 	}
 	
-	//Default
+	/** Default
+	 */
 	public FBTaskSameSize(String path, String name, long fileSize) {
-		this(path, name, fileSize, 100*1000);
+		this(path, name, fileSize, false);
 	}
 	
 	/**
@@ -31,11 +49,15 @@ public class FBTaskSameSize extends FBTask {
 			long currentPartSize = 0;
 			processed = 0;
 			
+			if(doCrypt) {
+				initCipher();
+			}
+			
 			InputStream iStream = new BufferedInputStream(new FileInputStream(getPathName()));
-			BufferedOutputStream oStream;
+			OutputStream oStream;
 			
 			do {
- 				oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension())));
+ 				oStream = getProperStream(fileCount, false);
 				long remainingBytes = getFileSize() - processed;
  				currentPartSize = ( partSize < remainingBytes ) ? partSize : remainingBytes;
 				
@@ -44,7 +66,7 @@ public class FBTaskSameSize extends FBTask {
 					iStream.read(bytes, 0, BLOCK_MAX_SIZE);
 					oStream.write(bytes);
 					oStream.close();
-					oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension()), true));
+					oStream = getProperStream(fileCount, true);
 					currentPartSize -= BLOCK_MAX_SIZE;
 					setProcessed(processed + BLOCK_MAX_SIZE);
 				}
@@ -66,6 +88,26 @@ public class FBTaskSameSize extends FBTask {
 			//TODO
 		}
 		
+	}
+	
+	private void initCipher() throws Exception {
+		byte[] key = password.getBytes("UTF-8");
+	    MessageDigest sha = MessageDigest.getInstance("SHA-1");
+	    key = sha.digest(key);
+	    key = Arrays.copyOf(key, 16); // use only first 128 bit
+
+	    SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
+	    cipher = Cipher.getInstance("AES");
+	    cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+	}
+	
+	private OutputStream getProperStream(int fileCount, boolean append) throws FileNotFoundException {
+		if(doCrypt) {
+			return new CipherOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension()), append), cipher);
+		}
+		else {
+			return new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension()), append));
+		}
 	}
 	
 	@Override

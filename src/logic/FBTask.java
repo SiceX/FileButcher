@@ -13,6 +13,7 @@ public abstract class FBTask extends Observable implements Runnable{
 	protected static final int BLOCK_MAX_SIZE = 50000000;
 	private String pathName;
 	private String fileName;
+	protected String password;
 	private long fileSize;
 	protected long processed;
 	private TaskMode mode;
@@ -80,6 +81,10 @@ public abstract class FBTask extends Observable implements Runnable{
 
 	public void setFileName(String name) {
 		this.fileName = name;
+	}
+
+	public void setPassword(String cryptKey) {
+		this.password = cryptKey;
 	}
 	
 	public String getParameters() {

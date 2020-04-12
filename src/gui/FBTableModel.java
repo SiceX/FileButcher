@@ -8,7 +8,6 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.JProgressBar;
 
 import logic.FBTask;
-import logic.FBTaskCryptSameSize;
 import logic.FBTaskCustomNumber;
 import logic.FBTaskSameSize;
 import logic.FBTaskZipCustomSize;
@@ -167,10 +166,7 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 	 */
 	public void setPassword(char[] charKey) {
 		for(int i=0; i<data.size(); i++) {
-			if(data.get(i).getMode() == TaskMode.CRYPT_SAME_SIZE) {
-				FBTaskCryptSameSize task = (FBTaskCryptSameSize)data.get(i);
-				task.setPassword(new String(charKey));
-			}
+			data.get(i).setPassword(new String(charKey));
 		}
 	}
 
@@ -185,7 +181,7 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 		switch(mode) {
 			case SAME_SIZE:			return new FBTaskSameSize(path, name, fileSize);
 			
-			case CRYPT_SAME_SIZE:	return new FBTaskCryptSameSize(path, name, fileSize);
+			case CRYPT_SAME_SIZE:	return new FBTaskSameSize(path, name, fileSize, true);
 			
 			case ZIP_CUSTOM_SIZE:	return new FBTaskZipCustomSize(path, name, fileSize);
 			

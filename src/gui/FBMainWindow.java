@@ -124,7 +124,7 @@ public class FBMainWindow extends JFrame{
 		
 		passwordPanel.add(cryptKeyField);
 		tblQueue.getColumnModel().getColumn(0).setPreferredWidth(92);
-		JComboBox cmbxCellEditor = new JComboBox(TaskMode.values());
+		JComboBox<TaskMode> cmbxCellEditor = new JComboBox<TaskMode>(TaskMode.values());
 		DefaultCellEditor editor = new DefaultCellEditor(cmbxCellEditor);
 		tblQueue.getColumnModel().getColumn(1).setCellEditor(editor);
 		
@@ -135,7 +135,7 @@ public class FBMainWindow extends JFrame{
 	}
 	
 	private FBTask createTask(String path, String name, long fileSize) {
-		return new FBTaskSameSize(path, name, fileSize, 100*1000);
+		return new FBTaskSameSize(path, name, fileSize, 100*1000, false);
 	}
 	
 //	private FBTask createTask(String path, String name, FBSelectMode dialog) {

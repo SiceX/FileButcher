@@ -12,10 +12,10 @@ import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.spec.SecretKeySpec;
 
+@Deprecated
 public class FBTaskCryptSameSize extends FBTask {
 	
 	private long partSize;
-	private String password;
 	
 	public FBTaskCryptSameSize(String path, String name, long fileSize, long pSize){
 		super(path, name, TaskMode.CRYPT_SAME_SIZE, fileSize);
@@ -122,10 +122,6 @@ public class FBTaskCryptSameSize extends FBTask {
 		if(param.getClass() == Long.class) {
 			partSize = (long)param;
 		}
-	}
-
-	public void setPassword(String cryptKey) {
-		this.password = cryptKey;
 	}
 
 }

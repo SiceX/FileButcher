@@ -7,11 +7,11 @@ import java.util.Observer;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.JProgressBar;
 
-import logic.FBTask;
-import logic.FBTaskCustomNumber;
-import logic.FBTaskSameSize;
-import logic.FBTaskZipCustomSize;
-import logic.TaskMode;
+import logic.tasks.FBTask;
+import logic.tasks.FBTaskCustomNumber;
+import logic.tasks.FBTaskSameSize;
+import logic.tasks.FBTaskZipCustomSize;
+import logic.tasks.TaskMode;
 
 @SuppressWarnings("serial")
 public class FBTableModel extends AbstractTableModel implements Observer{
@@ -179,7 +179,7 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 	
 	private FBTask createTask(String path, String name, TaskMode mode, long fileSize) {
 		switch(mode) {
-			case SAME_SIZE:			return new FBTaskSameSize(path, name, fileSize);
+			case SAME_SIZE:			return new FBTaskSameSize(path, name, fileSize, false);
 			
 			case CRYPT_SAME_SIZE:	return new FBTaskSameSize(path, name, fileSize, true);
 			

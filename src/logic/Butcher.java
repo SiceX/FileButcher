@@ -5,6 +5,8 @@ package logic;
 
 import java.util.ArrayList;
 
+import logic.tasks.FBTask;
+
 
 /**
  * @author nicola.ferrari

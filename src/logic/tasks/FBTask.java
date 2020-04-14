@@ -1,4 +1,4 @@
-package logic;
+package logic.tasks;
 
 import java.text.DecimalFormat;
 import java.util.Observable;
@@ -17,13 +17,15 @@ public abstract class FBTask extends Observable implements Runnable{
 	private long fileSize;
 	protected long processed;
 	private TaskMode mode;
+	protected boolean isRebuild;
 	
-	public FBTask(String path, String name, TaskMode tMode, long fSize) {
+	public FBTask(String path, String name, TaskMode tMode, boolean doRebuild, long fSize) {
 		setPathName(path);
 		setFileName(name);
 		setMode(tMode);
 		fileSize = fSize;
 		processed = 0;
+		isRebuild = doRebuild;
 	}
 	
 	/**
@@ -33,7 +35,7 @@ public abstract class FBTask extends Observable implements Runnable{
 	 * @param fileSize dimensione del file
 	 */
 	public FBTask(String path, String name, long fileSize){
-		this(path, name, TaskMode.SAME_SIZE, fileSize);
+		this(path, name, TaskMode.SAME_SIZE, false, fileSize);
 	}
 	
 	/**
@@ -41,6 +43,14 @@ public abstract class FBTask extends Observable implements Runnable{
 	 */
 	@Override
 	public void run() {
+		
+	}
+	
+	protected void doButchering() {
+		
+	}
+	
+	protected void doRebuilding() {
 		
 	}
 	
@@ -124,18 +134,7 @@ public abstract class FBTask extends Observable implements Runnable{
 	}
 	
 	public String getFileExtension() {
-		switch(mode) {
-		case SAME_SIZE:
-			return ".par";
-		case CRYPT_SAME_SIZE:
-			return ".crypar";
-		case ZIP_CUSTOM_SIZE:
-			return ".zipar";
-		case CUSTOM_NUMBER:
-			return ".parn";
-		default:
-			throw new NullPointerException();
-		}
+		return mode.getFileExtension();
 	}
 	
 }

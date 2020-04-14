@@ -3,6 +3,8 @@ package logic;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import logic.tasks.FBTask;
+
 @SuppressWarnings("serial")
 @Deprecated
 public class FBQueue extends ConcurrentLinkedQueue<FBTask>{

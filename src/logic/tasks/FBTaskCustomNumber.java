@@ -1,4 +1,4 @@
-package logic;
+package logic.tasks;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -10,18 +10,28 @@ public class FBTaskCustomNumber extends FBTask {
 	
 	private int numberOfParts;
 
-	public FBTaskCustomNumber(String path, String name, long fileSize, int nParts){
-		super(path, name, TaskMode.CUSTOM_NUMBER, fileSize);
+	public FBTaskCustomNumber(String path, String name, boolean doRebuild, long fileSize, int nParts){
+		super(path, name, TaskMode.CUSTOM_NUMBER, doRebuild, fileSize);
 		numberOfParts = nParts;
 	}
 	
 	//Default
 	public FBTaskCustomNumber(String path, String name, long fileSize){
-		this(path, name, fileSize, 2);
+		this(path, name, false, fileSize, 2);
 	}
 	
 	@Override
 	public void run() {
+		if(!super.isRebuild) {
+			doButchering();
+		}
+		else {
+			doRebuilding();
+		}
+	}
+	
+	@Override
+	protected void doButchering() {
 		try {
 			long partSize = getFileSize()/numberOfParts;
 			long carryBytes = getFileSize()-(partSize*numberOfParts);
@@ -60,6 +70,11 @@ public class FBTaskCustomNumber extends FBTask {
 			//throw e;
 			//TODO
 		}
+	}
+	
+	@Override
+	protected void doRebuilding() {
+		
 	}
 
 	@Override

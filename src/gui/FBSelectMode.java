@@ -6,8 +6,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.NumberFormatter;
 
-import logic.TaskMode;
 import logic.Unit;
+import logic.tasks.TaskMode;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;

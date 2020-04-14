@@ -4,6 +4,9 @@ import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 
 import logic.*;
+import logic.tasks.FBTask;
+import logic.tasks.FBTaskSameSize;
+import logic.tasks.TaskMode;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -115,6 +118,7 @@ public class FBMainWindow extends JFrame{
 		scrollPane.setViewportView(tblQueue);
 		
 		tblQueue.setModel(new FBTableModel());
+		tblQueue.getTableHeader().setReorderingAllowed(false);
 		
 		getContentPane().add(passwordPanel, "cell 0 1,growx,aligny center");
 		passwordPanel.setLayout(new GridLayout(2, 0, 0, 3));
@@ -124,9 +128,10 @@ public class FBMainWindow extends JFrame{
 		
 		passwordPanel.add(cryptKeyField);
 		tblQueue.getColumnModel().getColumn(0).setPreferredWidth(92);
-		JComboBox<TaskMode> cmbxCellEditor = new JComboBox<TaskMode>(TaskMode.values());
+		JComboBox/*<TaskMode>*/ cmbxCellEditor = new JComboBox/*<TaskMode>*/(TaskMode.values());
 		DefaultCellEditor editor = new DefaultCellEditor(cmbxCellEditor);
 		tblQueue.getColumnModel().getColumn(1).setCellEditor(editor);
+		tblQueue.getColumnModel().getColumn(1).setPreferredWidth(100);
 		
 		ProgressBarRenderer pbr = new ProgressBarRenderer(0, 100);
 		pbr.setStringPainted(true);
@@ -135,7 +140,7 @@ public class FBMainWindow extends JFrame{
 	}
 	
 	private FBTask createTask(String path, String name, long fileSize) {
-		return new FBTaskSameSize(path, name, fileSize, 100*1000, false);
+		return new FBTaskSameSize(path, name, false, fileSize, 100*1000, false);
 	}
 	
 //	private FBTask createTask(String path, String name, FBSelectMode dialog) {

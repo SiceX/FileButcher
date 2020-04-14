@@ -1,4 +1,4 @@
-package logic;
+package logic.tasks;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -21,22 +21,20 @@ public class FBTaskSameSize extends FBTask {
 	private boolean doCrypt;
 	private Cipher cipher;
 	
-	public FBTaskSameSize(String path, String name, long fileSize, long pSize, boolean crypt){
-		super(path, name, crypt ? TaskMode.CRYPT_SAME_SIZE : TaskMode.SAME_SIZE, fileSize);
+	public FBTaskSameSize(String path, String name, boolean doRebuild, long fileSize, long pSize, boolean crypt){
+		super(path, name, crypt ? TaskMode.CRYPT_SAME_SIZE : TaskMode.SAME_SIZE, false, fileSize);
 		partSize = pSize < fileSize ? pSize : fileSize;
 		doCrypt = crypt;
 	}
 
-	/** Default Crypt
+	/** Default
+	 * @param path
+	 * @param name
+	 * @param fileSize
+	 * @param crypt
 	 */
 	public FBTaskSameSize(String path, String name, long fileSize, boolean crypt) {
-		this(path, name, fileSize, 100*1000, crypt);
-	}
-	
-	/** Default
-	 */
-	public FBTaskSameSize(String path, String name, long fileSize) {
-		this(path, name, fileSize, false);
+		this(path, name, false, fileSize, 100*1000, crypt);
 	}
 	
 	/**
@@ -44,6 +42,16 @@ public class FBTaskSameSize extends FBTask {
 	 */
 	@Override
 	public void run() {
+		if(!super.isRebuild) {
+			doButchering();
+		}
+		else {
+			doRebuilding();
+		}
+	}
+	
+	@Override
+	protected void doButchering() {
 		try {
 			int fileCount = 1;
 			long currentPartSize = 0;
@@ -87,6 +95,10 @@ public class FBTaskSameSize extends FBTask {
 			//throw e;
 			//TODO
 		}
+	}
+	
+	@Override
+	protected void doRebuilding() {
 		
 	}
 	

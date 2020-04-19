@@ -23,15 +23,15 @@ public enum TaskMode {
 	
 	public String getFileExtension() {
        return fileExt;
-   }
+	}
 
-   public String getDisplayName() {
-       return displayName;
-   }
+	public String getDisplayName() {
+		return displayName;
+	}
 
-   @Override
-   public String toString() {
-       return displayName;
-   }
+	@Override
+	public String toString() {
+		return displayName;
+	}
 
 }

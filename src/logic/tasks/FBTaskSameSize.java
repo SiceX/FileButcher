@@ -2,14 +2,17 @@ package logic.tasks;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
@@ -22,12 +25,13 @@ public class FBTaskSameSize extends FBTask {
 	private Cipher cipher;
 	
 	public FBTaskSameSize(String path, String name, boolean doRebuild, long fileSize, long pSize, boolean crypt){
-		super(path, name, crypt ? TaskMode.CRYPT_SAME_SIZE : TaskMode.SAME_SIZE, false, fileSize);
+		super(path, name, crypt ? TaskMode.CRYPT_SAME_SIZE : TaskMode.SAME_SIZE, doRebuild, fileSize);
 		partSize = pSize < fileSize ? pSize : fileSize;
 		doCrypt = crypt;
 	}
 
-	/** Default
+	/** 
+	 * Default
 	 * @param path
 	 * @param name
 	 * @param fileSize
@@ -35,6 +39,17 @@ public class FBTaskSameSize extends FBTask {
 	 */
 	public FBTaskSameSize(String path, String name, long fileSize, boolean crypt) {
 		this(path, name, false, fileSize, 100*1000, crypt);
+	}
+	
+	/**
+	 * Rebuild Task
+	 * @param path
+	 * @param name
+	 * @param fileSize
+	 * @param crypt
+	 */
+	public FBTaskSameSize(String path, String name, boolean crypt) {
+		this(path, name, true, 0, 0, crypt);
 	}
 	
 	/**
@@ -99,7 +114,11 @@ public class FBTaskSameSize extends FBTask {
 	
 	@Override
 	protected void doRebuilding() {
+		File currentDirectory = new File(super.getPathName().substring(0, super.getPathName().length() - super.getFileName().length()));
+		File matchingFiles[] = getMatchingFiles(currentDirectory);
 		
+//		OutputStream oStream = 
+		//TODO
 	}
 	
 	private void initCipher() throws Exception {
@@ -120,6 +139,27 @@ public class FBTaskSameSize extends FBTask {
 		else {
 			return new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension()), append));
 		}
+	}
+	
+	private File[] getMatchingFiles(File currentDirectory) {
+		String tokens[] = super.getFileName().split("\\.");
+		String extension = super.getFileExtension();
+		StringBuilder sb = new StringBuilder();
+		
+		for(int i=0; i<tokens.length-2; i++) {
+			sb.append(tokens[i]).append(".");
+		}
+		sb.deleteCharAt(sb.length()-1);
+		String matchName = sb.toString();
+		
+		File[] matchingFiles = currentDirectory.listFiles(new FilenameFilter() {
+		    public boolean accept(File dir, String name) {
+		    	Pattern regex = Pattern.compile(matchName.replaceAll("\\.", "\\\\.") + "\\.\\d+" + extension.replaceAll("\\.", "\\\\."));
+		        return name.matches(regex.toString());
+		    }
+		});
+		
+		return matchingFiles;
 	}
 	
 	@Override

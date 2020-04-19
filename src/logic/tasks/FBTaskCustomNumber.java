@@ -2,9 +2,12 @@ package logic.tasks;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.InputStream;
+import java.util.regex.Pattern;
 
 public class FBTaskCustomNumber extends FBTask {
 	
@@ -15,9 +18,25 @@ public class FBTaskCustomNumber extends FBTask {
 		numberOfParts = nParts;
 	}
 	
-	//Default
+	/**
+	 * Default
+	 * @param path
+	 * @param name
+	 * @param fileSize
+	 */
 	public FBTaskCustomNumber(String path, String name, long fileSize){
 		this(path, name, false, fileSize, 2);
+	}
+	
+	/**
+	 * Rebuild
+	 * @param path
+	 * @param name
+	 * @param doRebuild
+	 * @param fileSize
+	 */
+	public FBTaskCustomNumber(String path, String name){
+		this(path, name, true, 0, 0);
 	}
 	
 	@Override
@@ -74,7 +93,31 @@ public class FBTaskCustomNumber extends FBTask {
 	
 	@Override
 	protected void doRebuilding() {
+		File currentDirectory = new File(super.getPathName().substring(0, super.getPathName().length() - super.getFileName().length()));
+		File matchingFiles[] = getMatchingFiles(currentDirectory);
 		
+		//TODO
+	}
+	
+	private File[] getMatchingFiles(File currentDirectory) {
+		String tokens[] = super.getFileName().split("\\.");
+		String extension = super.getFileExtension();
+		StringBuilder sb = new StringBuilder();
+		
+		for(int i=0; i<tokens.length-2; i++) {
+			sb.append(tokens[i]).append(".");
+		}
+		sb.deleteCharAt(sb.length()-1);
+		String matchName = sb.toString();
+		
+		File[] matchingFiles = currentDirectory.listFiles(new FilenameFilter() {
+		    public boolean accept(File dir, String name) {
+		    	Pattern regex = Pattern.compile(matchName.replaceAll("\\.", "\\\\.") + "\\.\\d+" + extension.replaceAll("\\.", "\\\\."));
+		        return name.matches(regex.toString());
+		    }
+		});
+		
+		return matchingFiles;
 	}
 
 	@Override

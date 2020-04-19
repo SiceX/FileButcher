@@ -5,6 +5,7 @@ import javax.swing.filechooser.FileSystemView;
 
 import logic.*;
 import logic.tasks.FBTask;
+import logic.tasks.FBTaskCustomNumber;
 import logic.tasks.FBTaskSameSize;
 import logic.tasks.TaskMode;
 
@@ -28,7 +29,7 @@ public class FBMainWindow extends JFrame{
 	private final Window mainWindowReference = this;
 	private final JPanel panel = new JPanel();
 	private final JButton btnRemoveSelected = new JButton("Rimuovi selezionati");
-	private final JButton btnButcher = new JButton("Esegui scomposizioni");
+	private final JButton btnButcher = new JButton("Esegui lavori");
 	private final JButton btnRebuild = new JButton("Ricomponi file");
 	private final JPanel passwordPanel = new JPanel();
 	private final JPasswordField cryptKeyField = new JPasswordField();
@@ -71,6 +72,20 @@ public class FBMainWindow extends JFrame{
 		});
 		
 		panel.add(btnButcher);
+		btnRebuild.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int res = fileChooser.showOpenDialog(mainWindowReference);
+				if(res == JFileChooser.APPROVE_OPTION) {
+					File file = fileChooser.getSelectedFile();
+					String tokens[] = file.getName().split("\\.");
+					
+					FBTask newTask = createRebuildTask(file.getPath(), file.getName(), "."+tokens[tokens.length-1]);
+						
+					FBTableModel model = (FBTableModel) tblQueue.getModel();
+				    model.addTask(newTask);
+				}
+			}
+		});
 		
 		panel.add(btnRebuild);
 		
@@ -140,9 +155,22 @@ public class FBMainWindow extends JFrame{
 	}
 	
 	private FBTask createTask(String path, String name, long fileSize) {
-		return new FBTaskSameSize(path, name, false, fileSize, 100*1000, false);
+		return new FBTaskSameSize(path, name, fileSize, false);
 	}
 	
+	private FBTask createRebuildTask(String path, String name, String ext) {
+		switch(ext) {
+			case ".par":			return new FBTaskSameSize(path, name, false);
+			
+			case ".crypar":			return new FBTaskSameSize(path, name, true);
+			
+			case ".zipar":			return null;//return new FBTaskZipCustomSize(path, name);
+			
+			case ".parn":			return new FBTaskCustomNumber(path, name);
+			
+			default:				return null;
+		}
+	}
 //	private FBTask createTask(String path, String name, FBSelectMode dialog) {
 //		switch(dialog.getChoice()) {
 //			case SAME_SIZE:			return new FBTaskSameSize(path, name, dialog.getPartsSize());

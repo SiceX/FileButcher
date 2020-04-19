@@ -7,6 +7,10 @@ import javax.swing.filechooser.FileSystemView;
 
 //import java.io.File;
 
+/**
+ * @author Sice
+ *
+ */
 public abstract class FBTask extends Observable implements Runnable{
 	//private File file;
 	public static final String RESULT_DIR = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\Splitted Files\\";
@@ -77,6 +81,9 @@ public abstract class FBTask extends Observable implements Runnable{
 		this.mode = type;
 	}
 
+	/**
+	 * @return whole path to file, file included
+	 */
 	public String getPathName() {
 		return pathName;
 	}
@@ -85,6 +92,9 @@ public abstract class FBTask extends Observable implements Runnable{
 		this.pathName = pathname;
 	}
 
+	/**
+	 * @return just the file's name without extension
+	 */
 	public String getFileName() {
 		return fileName;
 	}

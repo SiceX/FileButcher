@@ -8,9 +8,9 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.JProgressBar;
 
 import logic.tasks.FBTask;
-import logic.tasks.FBTaskCustomNumber;
-import logic.tasks.FBTaskSameSize;
-import logic.tasks.FBTaskZipCustomSize;
+import logic.tasks.FBTaskButcherCustomNumber;
+import logic.tasks.FBTaskButcherSameSize;
+import logic.tasks.FBTaskButcherZipCustomSize;
 import logic.tasks.TaskMode;
 
 @SuppressWarnings("serial")
@@ -62,7 +62,7 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 		else if(columnIndex == 2) { //Modifica parametri del task
 			String newStr = (String)value;
 			TaskMode mode = data.get(rowIndex).getMode();
-			if(mode == TaskMode.SAME_SIZE || mode == TaskMode.CRYPT_SAME_SIZE) {
+			if(mode == TaskMode.BUTCHER_SAME_SIZE || mode == TaskMode.BUTCHER_CRYPT_SAME_SIZE) {
 				long partSize = validateAndParse(newStr);
 				if(partSize > 0) {
 					if( partSize <= data.get(rowIndex).getFileSize() ) {
@@ -73,7 +73,7 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 					}
 				}
 			}
-			else if(mode == TaskMode.CUSTOM_NUMBER) {
+			else if(mode == TaskMode.BUTCHER_CUSTOM_NUMBER) {
 				try {
 					int nParts = Integer.parseInt(newStr);
 					if(nParts >= 1) {
@@ -82,7 +82,7 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 				}
 				catch(NumberFormatException e) {} //Do nothing
 			}
-			else if(mode == TaskMode.ZIP_CUSTOM_SIZE) {
+			else if(mode == TaskMode.BUTCHER_ZIP_CUSTOM_SIZE) {
 				//TODO DEFINIZIONE PARTI
 			}
 		}
@@ -135,8 +135,11 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 	
 	@Override
 	public boolean isCellEditable(int row, int col) {
-        if(col == 1) return true ;
-        if(col == 2) return true ;
+		TaskMode mode = data.get(row).getMode();
+		if(mode == TaskMode.BUTCHER_SAME_SIZE || mode == TaskMode.BUTCHER_CRYPT_SAME_SIZE || mode == TaskMode.BUTCHER_ZIP_CUSTOM_SIZE || mode == TaskMode.BUTCHER_CUSTOM_NUMBER) {
+	        if(col == 1) return true;
+	        if(col == 2) return true;
+		}
         return false;
      }
 	
@@ -179,13 +182,13 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 	
 	private FBTask createTask(String path, String name, TaskMode mode, long fileSize) {
 		switch(mode) {
-			case SAME_SIZE:			return new FBTaskSameSize(path, name, fileSize, false);
+			case BUTCHER_SAME_SIZE:			return new FBTaskButcherSameSize(path, name, fileSize, false);
 			
-			case CRYPT_SAME_SIZE:	return new FBTaskSameSize(path, name, fileSize, true);
+			case BUTCHER_CRYPT_SAME_SIZE:	return new FBTaskButcherSameSize(path, name, fileSize, true);
 			
-			case ZIP_CUSTOM_SIZE:	return new FBTaskZipCustomSize(path, name, fileSize);
+			case BUTCHER_ZIP_CUSTOM_SIZE:	return new FBTaskButcherZipCustomSize(path, name, fileSize);
 			
-			case CUSTOM_NUMBER:		return new FBTaskCustomNumber(path, name, fileSize);
+			case BUTCHER_CUSTOM_NUMBER:		return new FBTaskButcherCustomNumber(path, name, fileSize);
 			
 			default:				return null;
 		}

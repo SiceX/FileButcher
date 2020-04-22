@@ -21,15 +21,13 @@ public abstract class FBTask extends Observable implements Runnable{
 	private long fileSize;
 	protected long processed;
 	private TaskMode mode;
-	protected boolean isRebuild;
 	
-	public FBTask(String path, String name, TaskMode tMode, boolean doRebuild, long fSize) {
+	public FBTask(String path, String name, TaskMode tMode, long fSize) {
 		setPathName(path);
 		setFileName(name);
 		setMode(tMode);
 		fileSize = fSize;
 		processed = 0;
-		isRebuild = doRebuild;
 	}
 	
 	/**
@@ -39,7 +37,7 @@ public abstract class FBTask extends Observable implements Runnable{
 	 * @param fileSize dimensione del file
 	 */
 	public FBTask(String path, String name, long fileSize){
-		this(path, name, TaskMode.SAME_SIZE, false, fileSize);
+		this(path, name, TaskMode.BUTCHER_SAME_SIZE, fileSize);
 	}
 	
 	/**
@@ -64,13 +62,13 @@ public abstract class FBTask extends Observable implements Runnable{
 	
 	public String getModeDescription() {
 		switch(mode) {
-		case SAME_SIZE:
+		case BUTCHER_SAME_SIZE:
 			return "Divisione in parti di dimensioni uguali";
-		case CRYPT_SAME_SIZE:
+		case BUTCHER_CRYPT_SAME_SIZE:
 			return "Divisione in parti di dimensioni uguali con crittografia";
-		case ZIP_CUSTOM_SIZE:
+		case BUTCHER_ZIP_CUSTOM_SIZE:
 			return "Divisione e compresione in parti di dimensione specificata";
-		case CUSTOM_NUMBER:
+		case BUTCHER_CUSTOM_NUMBER:
 			return "Divisione in N parti";
 		default:
 			throw new NullPointerException();

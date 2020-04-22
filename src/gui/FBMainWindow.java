@@ -5,8 +5,9 @@ import javax.swing.filechooser.FileSystemView;
 
 import logic.*;
 import logic.tasks.FBTask;
-import logic.tasks.FBTaskCustomNumber;
-import logic.tasks.FBTaskSameSize;
+import logic.tasks.FBTaskRebuildCustomNumber;
+import logic.tasks.FBTaskRebuildSameSize;
+import logic.tasks.FBTaskButcherSameSize;
 import logic.tasks.TaskMode;
 
 import java.awt.*;
@@ -60,6 +61,22 @@ public class FBMainWindow extends JFrame{
 				model.removeSelectedRows(tblQueue.getSelectedRows());
 			}
 		});
+		btnRebuild.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int res = fileChooser.showOpenDialog(mainWindowReference);
+				if(res == JFileChooser.APPROVE_OPTION) {
+					File file = fileChooser.getSelectedFile();
+					String tokens[] = file.getName().split("\\.");
+					
+					FBTask newTask = createRebuildTask(file.getPath(), file.getName(), "."+tokens[tokens.length-1], file.length());
+						
+					FBTableModel model = (FBTableModel) tblQueue.getModel();
+				    model.addTask(newTask);
+				}
+			}
+		});
+		
+		panel.add(btnRebuild);
 		
 		panel.add(btnRemoveSelected);
 		btnButcher.addMouseListener(new MouseAdapter() {
@@ -72,22 +89,6 @@ public class FBMainWindow extends JFrame{
 		});
 		
 		panel.add(btnButcher);
-		btnRebuild.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int res = fileChooser.showOpenDialog(mainWindowReference);
-				if(res == JFileChooser.APPROVE_OPTION) {
-					File file = fileChooser.getSelectedFile();
-					String tokens[] = file.getName().split("\\.");
-					
-					FBTask newTask = createRebuildTask(file.getPath(), file.getName(), "."+tokens[tokens.length-1]);
-						
-					FBTableModel model = (FBTableModel) tblQueue.getModel();
-				    model.addTask(newTask);
-				}
-			}
-		});
-		
-		panel.add(btnRebuild);
 		
 		btnOpenResDirectory.addMouseListener(new MouseAdapter() {
 			@Override
@@ -143,8 +144,10 @@ public class FBMainWindow extends JFrame{
 		
 		passwordPanel.add(cryptKeyField);
 		tblQueue.getColumnModel().getColumn(0).setPreferredWidth(92);
-		JComboBox/*<TaskMode>*/ cmbxCellEditor = new JComboBox/*<TaskMode>*/(TaskMode.values());
-		DefaultCellEditor editor = new DefaultCellEditor(cmbxCellEditor);
+		JComboBox/*<TaskMode>*/ cmbxCellEditor = new JComboBox/*<TaskMode>*/(TaskMode.selectableValues());
+		DefaultCellEditor editor = new DefaultCellEditor(cmbxCellEditor) {
+			
+		};
 		tblQueue.getColumnModel().getColumn(1).setCellEditor(editor);
 		tblQueue.getColumnModel().getColumn(1).setPreferredWidth(100);
 		
@@ -154,35 +157,34 @@ public class FBMainWindow extends JFrame{
 				
 	}
 	
+	/** Crea un Task di scomposizione di default, un SAME_SIZE con parti da 500 KB
+	 * @param path		Nome completo di indirizzo del file
+	 * @param name		Solo il nome del file, senza il path
+	 * @param fileSize 	Grandezza del file
+	 * @return
+	 */
 	private FBTask createTask(String path, String name, long fileSize) {
-		return new FBTaskSameSize(path, name, fileSize, false);
+		return new FBTaskButcherSameSize(path, name, fileSize, false);
 	}
 	
-	private FBTask createRebuildTask(String path, String name, String ext) {
+	/** Crea un Task di ricostruzione di un file appropriato all'estenzione della prima partr
+	 * @param path	Nome completo di indirizzo del file
+	 * @param name	Solo il nome del file, senza il path
+	 * @param ext	Estensione del file
+	 * @return
+	 */
+	private FBTask createRebuildTask(String path, String name, String ext, long fileSize) {
 		switch(ext) {
-			case ".par":			return new FBTaskSameSize(path, name, false);
+			case ".par":			return new FBTaskRebuildSameSize(path, name, false, fileSize);
 			
-			case ".crypar":			return new FBTaskSameSize(path, name, true);
+			case ".crypar":			return new FBTaskRebuildSameSize(path, name, true, fileSize);
 			
 			case ".zipar":			return null;//return new FBTaskZipCustomSize(path, name);
 			
-			case ".parn":			return new FBTaskCustomNumber(path, name);
+			case ".parn":			return new FBTaskRebuildCustomNumber(path, name, fileSize);
 			
 			default:				return null;
 		}
 	}
-//	private FBTask createTask(String path, String name, FBSelectMode dialog) {
-//		switch(dialog.getChoice()) {
-//			case SAME_SIZE:			return new FBTaskSameSize(path, name, dialog.getPartsSize());
-//			
-//			case CRYPT_SAME_SIZE:	return new FBTaskCryptSameSize(path, name, dialog.getPartsSize());
-//			
-//			case ZIP_CUSTOM_SIZE:	return new FBTaskZipCustomSize(path, name);
-//			
-//			case CUSTOM_NUMBER:		return new FBTaskCustomNumber(path, name, dialo);
-//			
-//			default:				return null;
-//		}
-//	}
 }
 

@@ -2,71 +2,47 @@ package logic.tasks;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.util.Arrays;
-import java.util.regex.Pattern;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.spec.SecretKeySpec;
 
-public class FBTaskSameSize extends FBTask {
+public class FBTaskButcherSameSize extends FBTask {
 	
 	private long partSize;
 	private boolean doCrypt;
 	private Cipher cipher;
 	
-	public FBTaskSameSize(String path, String name, boolean doRebuild, long fileSize, long pSize, boolean crypt){
-		super(path, name, crypt ? TaskMode.CRYPT_SAME_SIZE : TaskMode.SAME_SIZE, doRebuild, fileSize);
+	public FBTaskButcherSameSize(String path, String name, long fileSize, long pSize, boolean crypt){
+		super(path, name, crypt ? TaskMode.BUTCHER_CRYPT_SAME_SIZE : TaskMode.BUTCHER_SAME_SIZE, fileSize);
 		partSize = pSize < fileSize ? pSize : fileSize;
 		doCrypt = crypt;
 	}
 
 	/** 
 	 * Default
-	 * @param path
-	 * @param name
-	 * @param fileSize
-	 * @param crypt
+	 * @param path		Nome completo di indirizzo del file
+	 * @param name		Solo il nome del file, senza il path
+	 * @param fileSize	Grandezza del file
+	 * @param crypt		Se criptare o no
 	 */
-	public FBTaskSameSize(String path, String name, long fileSize, boolean crypt) {
-		this(path, name, false, fileSize, 100*1000, crypt);
+	public FBTaskButcherSameSize(String path, String name, long fileSize, boolean crypt) {
+		this(path, name, fileSize, 100*1000, crypt);
 	}
 	
 	/**
-	 * Rebuild Task
-	 * @param path
-	 * @param name
-	 * @param fileSize
-	 * @param crypt
-	 */
-	public FBTaskSameSize(String path, String name, boolean crypt) {
-		this(path, name, true, 0, 0, crypt);
-	}
-	
-	/**
-	 * Esecuzione della divisione in parti uguali
+	 * Scomposizione in parti uguali
 	 */
 	@Override
 	public void run() {
-		if(!super.isRebuild) {
-			doButchering();
-		}
-		else {
-			doRebuilding();
-		}
-	}
-	
-	@Override
-	protected void doButchering() {
 		try {
 			int fileCount = 1;
 			long currentPartSize = 0;
@@ -112,15 +88,9 @@ public class FBTaskSameSize extends FBTask {
 		}
 	}
 	
-	@Override
-	protected void doRebuilding() {
-		File currentDirectory = new File(super.getPathName().substring(0, super.getPathName().length() - super.getFileName().length()));
-		File matchingFiles[] = getMatchingFiles(currentDirectory);
-		
-//		OutputStream oStream = 
-		//TODO
-	}
-	
+	/** Inizializzazione del Cipher con la password fornita
+	 * @throws Exception
+	 */
 	private void initCipher() throws Exception {
 		byte[] key = password.getBytes("UTF-8");
 	    MessageDigest sha = MessageDigest.getInstance("SHA-1");
@@ -132,6 +102,12 @@ public class FBTaskSameSize extends FBTask {
 	    cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
 	}
 	
+	/** Ritorna l'OutputStream appropriato, normale o criptato
+	 * @param fileCount Counter delle parti, impostare -1 se non si vuole aggiungere
+	 * @param append	Se aprire o no lo stream in modalità append
+	 * @return L'OutputStream appropriato, normale o criptato
+	 * @throws FileNotFoundException
+	 */
 	private OutputStream getProperStream(int fileCount, boolean append) throws FileNotFoundException {
 		if(doCrypt) {
 			return new CipherOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension()), append), cipher);
@@ -139,27 +115,6 @@ public class FBTaskSameSize extends FBTask {
 		else {
 			return new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension()), append));
 		}
-	}
-	
-	private File[] getMatchingFiles(File currentDirectory) {
-		String tokens[] = super.getFileName().split("\\.");
-		String extension = super.getFileExtension();
-		StringBuilder sb = new StringBuilder();
-		
-		for(int i=0; i<tokens.length-2; i++) {
-			sb.append(tokens[i]).append(".");
-		}
-		sb.deleteCharAt(sb.length()-1);
-		String matchName = sb.toString();
-		
-		File[] matchingFiles = currentDirectory.listFiles(new FilenameFilter() {
-		    public boolean accept(File dir, String name) {
-		    	Pattern regex = Pattern.compile(matchName.replaceAll("\\.", "\\\\.") + "\\.\\d+" + extension.replaceAll("\\.", "\\\\."));
-		        return name.matches(regex.toString());
-		    }
-		});
-		
-		return matchingFiles;
 	}
 	
 	@Override

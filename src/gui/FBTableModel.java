@@ -19,9 +19,7 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 	private final String[] columnNames = {"File", "Modalità", "Parametri", "Dimensione", "Progresso"};
 	private final ArrayList<FBTask> data = new ArrayList<FBTask>();
 	
-	public FBTableModel() {
-		//
-	}
+	public FBTableModel() {	}
 
 	@Override
     public String getColumnName(int columnIndex){
@@ -122,8 +120,7 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 				case 1:		return task.getMode();
 				case 2: 	return task.getParameters();
 				case 3: 	return task.getFileSizeFormatted();
-				case 4: 	double progress = ((double)task.getProcessed() / task.getFileSize()) * 100;
-							return progress;
+				case 4: 	return task.getProcessedPercentage();
 				default:	throw new ArrayIndexOutOfBoundsException();
 			}
 		}

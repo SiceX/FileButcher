@@ -81,4 +81,10 @@ public class FBTaskButcherCustomNumber extends FBTask {
 			numberOfParts = (int)param;
 		}
 	}
+
+	@Override
+	public double getProcessedPercentage() {
+		double progress = ((double)getProcessed() / getFileSize()) * 100;
+		return progress;
+	}
 }

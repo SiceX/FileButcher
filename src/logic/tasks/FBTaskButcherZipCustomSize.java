@@ -31,4 +31,10 @@ public class FBTaskButcherZipCustomSize extends FBTask {
 		//TODO
 	}
 
+	@Override
+	public double getProcessedPercentage() {
+		double progress = ((double)getProcessed() / getFileSize()) * 100;
+		return progress;
+	}
+
 }

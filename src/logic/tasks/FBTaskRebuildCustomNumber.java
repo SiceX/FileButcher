@@ -13,6 +13,7 @@ public class FBTaskRebuildCustomNumber extends FBTask {
 	
 	private String currentDir;
 	private String originalFileName;
+	private long rebuiltFileSize;
 
 	/**
 	 * Rebuild
@@ -61,5 +62,11 @@ public class FBTaskRebuildCustomNumber extends FBTask {
 	@Override
 	public String getParameters() {
 		return "Ricomposizione";
+	}
+
+	@Override
+	public double getProcessedPercentage() {
+		double progress = ((double)getProcessed() / rebuiltFileSize) * 100;
+		return progress;
 	}
 }

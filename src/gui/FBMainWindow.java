@@ -33,16 +33,12 @@ public class FBMainWindow extends JFrame{
 	private final JButton btnButcher = new JButton("Esegui lavori");
 	private final JButton btnRebuild = new JButton("Ricomponi file");
 	private final JPanel passwordPanel = new JPanel();
-	private final JPasswordField cryptKeyField = new JPasswordField();
-	private final JLabel lblCryptKeyField = new JLabel("Password");
 	private final JButton btnOpenResDirectory = new JButton("Apri cartella risultati");
 	
 	
 
 	public FBMainWindow() {
 		super();
-		lblCryptKeyField.setHorizontalAlignment(SwingConstants.CENTER);
-		lblCryptKeyField.setLabelFor(cryptKeyField);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("FileButcher");
 		setSize(600, 300);
@@ -83,7 +79,6 @@ public class FBMainWindow extends JFrame{
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				FBTableModel model = (FBTableModel)tblQueue.getModel();
-				model.setPassword(cryptKeyField.getPassword());
 				Butcher.executeOrder66(model.getData());
 			}
 		});
@@ -138,11 +133,6 @@ public class FBMainWindow extends JFrame{
 		
 		getContentPane().add(passwordPanel, "cell 0 1,growx,aligny center");
 		passwordPanel.setLayout(new GridLayout(2, 0, 0, 3));
-		
-		passwordPanel.add(lblCryptKeyField);
-		cryptKeyField.setToolTipText("Chiave usata per la crittazione");
-		
-		passwordPanel.add(cryptKeyField);
 		tblQueue.getColumnModel().getColumn(0).setPreferredWidth(92);
 		JComboBox/*<TaskMode>*/ cmbxCellEditor = new JComboBox/*<TaskMode>*/(TaskMode.selectableValues());
 		DefaultCellEditor editor = new DefaultCellEditor(cmbxCellEditor) {

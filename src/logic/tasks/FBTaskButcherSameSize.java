@@ -5,14 +5,24 @@ import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.Key;
 import java.security.MessageDigest;
+import java.security.SecureRandom;
+import java.security.spec.KeySpec;
 import java.text.DecimalFormat;
 import java.util.Arrays;
+import java.util.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class FBTaskButcherSameSize extends FBTask {
@@ -20,6 +30,8 @@ public class FBTaskButcherSameSize extends FBTask {
 	private long partSize;
 	private boolean doCrypt;
 	private Cipher cipher;
+	private byte[] encodedKey;
+	private byte[] iv;
 	
 	public FBTaskButcherSameSize(String path, String name, long fileSize, long pSize, boolean crypt){
 		super(path, name, crypt ? TaskMode.BUTCHER_CRYPT_SAME_SIZE : TaskMode.BUTCHER_SAME_SIZE, fileSize);
@@ -83,23 +95,25 @@ public class FBTaskButcherSameSize extends FBTask {
 			iStream.close();
 		}
 		catch(Throwable e) {
-			//throw e;
-			//TODO
+			e.printStackTrace();
 		}
 	}
 	
 	/** Inizializzazione del Cipher con la password fornita
+	 * Algoritmo AES con padding e metodo CBC (instead of EBC). PKCS5Padding
+	 * Mentre EBC critta i blocchi indipendentemente l'uno dall'altro,
+	 * CBC usa uno XOR tra i blocchi per rendere la codifica nel complesso più sicura.
 	 * @throws Exception
 	 */
 	private void initCipher() throws Exception {
-		byte[] key = password.getBytes("UTF-8");
-	    MessageDigest sha = MessageDigest.getInstance("SHA-1");
-	    key = sha.digest(key);
-	    key = Arrays.copyOf(key, 16); // use only first 128 bit
-
-	    SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
-	    cipher = Cipher.getInstance("AES");
-	    cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+		KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+		keyGen.init(128); // Key size
+		SecretKey key = keyGen.generateKey();
+		cipher = Cipher.getInstance("AES/ECB/NoPadding");
+		cipher.init(Cipher.ENCRYPT_MODE, key);
+		
+		encodedKey = key.getEncoded();
+		iv = cipher.getIV();
 	}
 	
 	/** Ritorna l'OutputStream appropriato, normale o criptato
@@ -108,8 +122,18 @@ public class FBTaskButcherSameSize extends FBTask {
 	 * @return L'OutputStream appropriato, normale o criptato
 	 * @throws FileNotFoundException
 	 */
-	private OutputStream getProperStream(int fileCount, boolean append) throws FileNotFoundException {
+	private OutputStream getProperStream(int fileCount, boolean append) throws FileNotFoundException { 
 		if(doCrypt) {
+			if(fileCount == 1) {
+				// Salvo la chiave codificata nel primo file
+				OutputStream os = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension()), false));
+				try {
+					os.write(encodedKey);
+					os.write(iv);
+					os.close();
+					append = true;
+				} catch (IOException e) { e.printStackTrace(); }
+			}
 			return new CipherOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension()), append), cipher);
 		}
 		else {
@@ -139,6 +163,12 @@ public class FBTaskButcherSameSize extends FBTask {
 		if(param.getClass() == Long.class) {
 			partSize = (long)param;
 		}
+	}
+
+	@Override
+	public double getProcessedPercentage() {
+		double progress = ((double)getProcessed() / getFileSize()) * 100;
+		return progress;
 	}
 
 }

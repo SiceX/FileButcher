@@ -119,6 +119,8 @@ public abstract class FBTask extends Observable implements Runnable{
 		return processed;
 	}
 	
+	public abstract double getProcessedPercentage();
+	
 	protected void setProcessed(long proc) {
 		processed = proc;
 		setChanged();

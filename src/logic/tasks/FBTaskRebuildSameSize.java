@@ -7,35 +7,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.KeySpec;
-import java.util.Arrays;
 import java.util.regex.Pattern;
-
-import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.CipherOutputStream;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
 
 public class FBTaskRebuildSameSize extends FBTask {
 
 	private String currentDir;
 	private String originalFileName;
-	private boolean doCrypt;
-	private Cipher cipher;
-	private byte encodedKey[];
-	private byte iv[];
 	private long rebuiltFileSize;
 
 	/**
@@ -43,11 +22,9 @@ public class FBTaskRebuildSameSize extends FBTask {
 	 * @param path		Nome completo di indirizzo del file
 	 * @param name		Solo il nome del file, senza il path
 	 * @param fileSize	Grandezza del file
-	 * @param crypt		Se criptare o no
 	 */
-	public FBTaskRebuildSameSize(String path, String name, boolean crypt, long fileSize) {
-		super(path, name, crypt ? TaskMode.REBUILD_CRYPT_SAME_SIZE : TaskMode.REBUILD_SAME_SIZE, fileSize);
-		doCrypt = crypt;
+	public FBTaskRebuildSameSize(String path, String name, long fileSize) {
+		super(path, name, TaskMode.REBUILD_SAME_SIZE, fileSize);
 		currentDir = super.getPathName().substring(0, super.getPathName().length() - super.getFileName().length());
 		String tokens[] = super.getFileName().split("\\.");
 		StringBuilder sb = new StringBuilder();
@@ -56,8 +33,6 @@ public class FBTaskRebuildSameSize extends FBTask {
 		}
 		sb.deleteCharAt(sb.length()-1);
 		originalFileName = sb.toString();
-		encodedKey = new byte[16];
-		iv = new byte[16];
 		rebuiltFileSize = 0;
 	}
 	
@@ -78,7 +53,7 @@ public class FBTaskRebuildSameSize extends FBTask {
 			
 			for(int i=0; i<matchingFiles.length; i++) {
 				oStream = new BufferedOutputStream(new FileOutputStream(currentDir+originalFileName, true));
-				iStream = getProperStream(i+1, matchingFiles[i].getPath());
+				iStream = new BufferedInputStream(new FileInputStream(matchingFiles[i].getPath()));
 				currentFileSize = matchingFiles[i].length();
 
 				while(currentFileSize > BLOCK_MAX_SIZE) {
@@ -91,13 +66,7 @@ public class FBTaskRebuildSameSize extends FBTask {
 					setProcessed(processed + BLOCK_MAX_SIZE);
 				}
 				
-				byte[] bytes;
-//				if(doCrypt) {
-//					bytes = new byte[(int)currentFileSize - (48)];
-//				}
-//				else {
-					bytes = new byte[(int)currentFileSize];
-				//}
+				byte[] bytes = new byte[(int)currentFileSize];
 				iStream.read(bytes);
 				
 				oStream.write(bytes);
@@ -107,56 +76,8 @@ public class FBTaskRebuildSameSize extends FBTask {
 			}
 		}
 		catch(Throwable e) {
-			System.out.println(e.getMessage());
-		}
-	}
-	
-	/** Inizializzazione del Cipher con la password fornita
-	 * Algoritmo AES con padding e metodo CBC (instead of EBC). 
-	 * Mentre EBC cifra i blocchi indipendentemente l'uno dall'altro,
-	 * CBC usa uno XOR tra i blocchi per rendere la codifica nel complesso più sicura.
-	 * @throws Exception
-	 */
-	private void initCipher(){
-		try {
-			SecretKey key = new SecretKeySpec(encodedKey, "AES");
-
-			cipher = Cipher.getInstance("AES/ECB/NoPadding");
-			cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
-		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-	
-	/** Ritorna l'OutputStream appropriato, normale o criptato
-	 * @param fileCount Counter delle parti, impostare -1 se non si vuole aggiungere
-	 * @param append	Se aprire o no lo stream in modalità append
-	 * @return L'OutputStream appropriato, normale o criptato
-	 * @throws FileNotFoundException
-	 */
-	private InputStream getProperStream(int fileCount, String path) throws FileNotFoundException {
-		if(doCrypt) {
-			if(fileCount == 1) {
-				try {
-					BufferedInputStream is = new BufferedInputStream(new FileInputStream(path));
-					is.read(encodedKey);
-					is.read(iv);
-					is.close();
-					initCipher();
-					CipherInputStream cis = new CipherInputStream(new FileInputStream(path), cipher);
-					byte[] skip = new byte[encodedKey.length + iv.length];
-					cis.read(skip);
-					//cis.skip(encodedKey.length + iv.length);
-					return cis;
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			else {
-				return new CipherInputStream(new FileInputStream(path), cipher);
-			}
-		}
-		return new BufferedInputStream(new FileInputStream(path));
 	}
 	
 	/** Ritrovamento delle altre parti del file dalla stessa directory

@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.regex.Pattern;
 
 public class FBTaskRebuildCustomNumber extends FBTask {
@@ -42,7 +43,40 @@ public class FBTaskRebuildCustomNumber extends FBTask {
 		File currentDirectory = new File(super.getPathName().substring(0, super.getPathName().length() - super.getFileName().length()));
 		File matchingFiles[] = getMatchingFiles(currentDirectory);
 		
-		//TODO
+		try {
+			long currentFileSize;
+			setProcessed(0);
+			
+			OutputStream oStream;
+			InputStream iStream;
+			
+			for(int i=0; i<matchingFiles.length; i++) {
+				oStream = new BufferedOutputStream(new FileOutputStream(currentDir+originalFileName, true));
+				iStream = new BufferedInputStream(new FileInputStream(matchingFiles[i].getPath()));
+				currentFileSize = matchingFiles[i].length();
+
+				while(currentFileSize > BLOCK_MAX_SIZE) {
+					byte[] bytes = new byte[BLOCK_MAX_SIZE];
+					iStream.read(bytes);
+					oStream.write(bytes);
+					oStream.close();
+					oStream = new BufferedOutputStream(new FileOutputStream(currentDir+originalFileName, true));
+					currentFileSize -= BLOCK_MAX_SIZE;
+					setProcessed(processed + BLOCK_MAX_SIZE);
+				}
+				
+				byte[] bytes = new byte[(int)currentFileSize];
+				iStream.read(bytes);
+				
+				oStream.write(bytes);
+				oStream.close();
+				iStream.close();
+				setProcessed(processed + currentFileSize);
+			}
+		}
+		catch(Throwable e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private File[] getMatchingFiles(File currentDirectory) {

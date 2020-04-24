@@ -1,11 +1,13 @@
 package gui;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
 import logic.*;
 import logic.tasks.FBTask;
 import logic.tasks.FBTaskRebuildCustomNumber;
+import logic.tasks.FBTaskRebuildCrypt;
 import logic.tasks.FBTaskRebuildSameSize;
 import logic.tasks.FBTaskButcherSameSize;
 import logic.tasks.TaskMode;
@@ -59,6 +61,8 @@ public class FBMainWindow extends JFrame{
 		});
 		btnRebuild.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Parti di file", "par", "crypar", "zipar", "parn");
+				fileChooser.setFileFilter(filter);
 				int res = fileChooser.showOpenDialog(mainWindowReference);
 				if(res == JFileChooser.APPROVE_OPTION) {
 					File file = fileChooser.getSelectedFile();
@@ -69,6 +73,7 @@ public class FBMainWindow extends JFrame{
 					FBTableModel model = (FBTableModel) tblQueue.getModel();
 				    model.addTask(newTask);
 				}
+				fileChooser.resetChoosableFileFilters();
 			}
 		});
 		
@@ -154,7 +159,7 @@ public class FBMainWindow extends JFrame{
 	 * @return
 	 */
 	private FBTask createTask(String path, String name, long fileSize) {
-		return new FBTaskButcherSameSize(path, name, fileSize, false);
+		return new FBTaskButcherSameSize(path, name, fileSize);
 	}
 	
 	/** Crea un Task di ricostruzione di un file appropriato all'estenzione della prima partr
@@ -165,9 +170,9 @@ public class FBMainWindow extends JFrame{
 	 */
 	private FBTask createRebuildTask(String path, String name, String ext, long fileSize) {
 		switch(ext) {
-			case ".par":			return new FBTaskRebuildSameSize(path, name, false, fileSize);
+			case ".par":			return new FBTaskRebuildSameSize(path, name, fileSize);
 			
-			case ".crypar":			return new FBTaskRebuildSameSize(path, name, true, fileSize);
+			case ".crypar":			return new FBTaskRebuildCrypt(path, name, fileSize);
 			
 			case ".zipar":			return null;//return new FBTaskZipCustomSize(path, name);
 			

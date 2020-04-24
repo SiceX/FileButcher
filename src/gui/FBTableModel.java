@@ -8,6 +8,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.JProgressBar;
 
 import logic.tasks.FBTask;
+import logic.tasks.FBTaskButcherCrypt;
 import logic.tasks.FBTaskButcherCustomNumber;
 import logic.tasks.FBTaskButcherSameSize;
 import logic.tasks.FBTaskButcherZipCustomSize;
@@ -179,9 +180,9 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 	
 	private FBTask createTask(String path, String name, TaskMode mode, long fileSize) {
 		switch(mode) {
-			case BUTCHER_SAME_SIZE:			return new FBTaskButcherSameSize(path, name, fileSize, false);
+			case BUTCHER_SAME_SIZE:			return new FBTaskButcherSameSize(path, name, fileSize);
 			
-			case BUTCHER_CRYPT_SAME_SIZE:	return new FBTaskButcherSameSize(path, name, fileSize, true);
+			case BUTCHER_CRYPT_SAME_SIZE:	return new FBTaskButcherCrypt(path, name, fileSize);
 			
 			case BUTCHER_ZIP_CUSTOM_SIZE:	return new FBTaskButcherZipCustomSize(path, name, fileSize);
 			

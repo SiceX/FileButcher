@@ -74,6 +74,7 @@ public class FBTaskRebuildSameSize extends FBTask {
 				iStream.close();
 				setProcessed(processed + currentFileSize);
 			}
+			setCompleted(true);
 		}
 		catch(Throwable e) {
 			e.printStackTrace();

@@ -61,7 +61,7 @@ public class FBTaskButcherCustomNumber extends FBTask {
 				oStream.close();
 				setProcessed(processed + currentPartSize);
 			}
-			
+			setCompleted(true);
 			iStream.close();
 		}
 		catch(Throwable e) {

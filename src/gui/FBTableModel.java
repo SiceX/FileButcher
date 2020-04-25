@@ -144,9 +144,10 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 	public void addTask(FBTask task) {
 		data.add(task);
 		task.addObserver(this);
+		purgeCompleted();
 		fireTableRowsInserted(data.size(), data.size());
 	}
-	
+
 	public void removeTask(FBTask task) {
         if (data.contains(task)) {
             int row = data.indexOf(task);
@@ -160,9 +161,18 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 			removeTask(data.get(selection[i]));
 		}
 	}
+
+	/** Se ci sono task completati, li rimuove dalla coda 
+	 */
+	private void purgeCompleted() {
+		for(int i=data.size()-1; i>=0; i--) {
+			if(data.get(i).isCompleted()) {
+				removeTask(data.get(i));
+			}
+		}
+	}
 	
-	/**
-	 * Se ci sono dei task che richiedono la crittazione, ne imposta la chiave di crittazione
+	/** Se ci sono dei task che richiedono la crittazione, ne imposta la chiave di crittazione
 	 * @param cryptKey chiave di crittazione, password
 	 */
 	public void setPassword(char[] charKey) {
@@ -188,7 +198,7 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 			
 			case BUTCHER_CUSTOM_NUMBER:		return new FBTaskButcherCustomNumber(path, name, fileSize);
 			
-			default:				return null;
+			default: return null;
 		}
 	}
 
@@ -201,20 +211,3 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 	}
 
 }
-
-
-//Iterator<FBTask> it = queueData.iterator();
-//
-//int i=0;
-//while(it.hasNext() && i<rowIndex) {
-//	
-//}
-//
-//while(it.hasNext()) {
-//	data[i][0] = it.next().getName();
-//	data[i][1] = it.next().getModeDescription();
-//	i++;
-//}
-//
-//return data;
-//return null;

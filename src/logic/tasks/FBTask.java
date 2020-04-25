@@ -20,6 +20,7 @@ public abstract class FBTask extends Observable implements Runnable{
 	protected String password;
 	private long fileSize;
 	protected long processed;
+	private boolean completed;
 	private TaskMode mode;
 	
 	public FBTask(String path, String name, TaskMode tMode, long fSize) {
@@ -28,6 +29,7 @@ public abstract class FBTask extends Observable implements Runnable{
 		setMode(tMode);
 		fileSize = fSize;
 		processed = 0;
+		setCompleted(false);
 	}
 	
 	/**
@@ -145,6 +147,14 @@ public abstract class FBTask extends Observable implements Runnable{
 	
 	public String getFileExtension() {
 		return mode.getFileExtension();
+	}
+
+	public boolean isCompleted() {
+		return completed;
+	}
+
+	public void setCompleted(boolean completed) {
+		this.completed = completed;
 	}
 	
 }

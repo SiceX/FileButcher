@@ -1,30 +1,16 @@
 package logic.tasks;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.Key;
-import java.security.MessageDigest;
-import java.security.SecureRandom;
-import java.security.spec.KeySpec;
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.Base64;
-
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
-
 public class FBTaskButcherCrypt extends FBTask {
 	
 	private long partSize;
@@ -93,7 +79,7 @@ public class FBTaskButcherCrypt extends FBTask {
 				setProcessed(processed + currentPartSize);
 				
 			}while(iStream.available() > 0);
-			
+			setCompleted(true);
 			iStream.close();
 		}
 		catch(Throwable e) {
@@ -125,16 +111,6 @@ public class FBTaskButcherCrypt extends FBTask {
 	 * @throws FileNotFoundException
 	 */
 	private OutputStream getStream(int fileCount, boolean append) throws FileNotFoundException { 
-//		if(fileCount == 1) {
-//			// Salvo la chiave codificata nel primo file
-//			OutputStream os = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension()), false));
-//			try {
-//				os.write(encodedKey);
-//				os.write(iv);
-//				os.close();
-//				append = true;
-//			} catch (IOException e) { e.printStackTrace(); }
-//		}
 		return new CipherOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension()), append), cipher);
 	}
 	

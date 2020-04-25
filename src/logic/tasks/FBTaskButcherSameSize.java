@@ -65,7 +65,7 @@ public class FBTaskButcherSameSize extends FBTask {
 				setProcessed(processed + currentPartSize);
 				
 			}while(iStream.available() > 0);
-			
+			setCompleted(true);
 			iStream.close();
 		}
 		catch(Throwable e) {

@@ -73,6 +73,7 @@ public class FBTaskRebuildCustomNumber extends FBTask {
 				iStream.close();
 				setProcessed(processed + currentFileSize);
 			}
+			setCompleted(true);
 		}
 		catch(Throwable e) {
 			e.printStackTrace();

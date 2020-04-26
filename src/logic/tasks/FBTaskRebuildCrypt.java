@@ -8,6 +8,7 @@ import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.text.DecimalFormat;
 import java.util.regex.Pattern;
 
 import javax.crypto.Cipher;
@@ -22,6 +23,7 @@ public class FBTaskRebuildCrypt extends FBTask {
 	private Cipher cipher;
 	private byte encodedKey[];
 	private byte iv[];
+	private File matchingFiles[];
 	private long rebuiltFileSize;
 
 	/**
@@ -42,7 +44,10 @@ public class FBTaskRebuildCrypt extends FBTask {
 		originalFileName = sb.toString();
 		encodedKey = new byte[32];
 		iv = new byte[16];
+		
 		rebuiltFileSize = 0;
+		File currentDirectory = new File(super.getPathName().substring(0, super.getPathName().length() - super.getFileName().length()));
+		matchingFiles = getMatchingFiles(currentDirectory);
 	}
 	
 	/**
@@ -50,9 +55,6 @@ public class FBTaskRebuildCrypt extends FBTask {
 	 */
 	@Override
 	public void run() {
-		File currentDirectory = new File(super.getPathName().substring(0, super.getPathName().length() - super.getFileName().length()));
-		File matchingFiles[] = getMatchingFiles(currentDirectory);
-		
 		try {
 			long currentFileSize;
 			setProcessed(0);
@@ -142,8 +144,25 @@ public class FBTaskRebuildCrypt extends FBTask {
 	}
 	
 	@Override
+	public String getFileSizeFormatted() {
+		DecimalFormat df = new DecimalFormat("#.##");
+		if(rebuiltFileSize < 1000) {
+			return rebuiltFileSize + " B";
+		}
+		else if(rebuiltFileSize < 1000000) {
+			return df.format(((double)rebuiltFileSize)/1000) + " KB";
+		}
+		else if(rebuiltFileSize < 1000000000) {
+			return df.format(((double)rebuiltFileSize)/1000000) + " MB";
+		}
+		else {
+			return df.format(((double)rebuiltFileSize)/1000000000) + " GB";
+		}
+	}
+	
+	@Override
 	public String getParameters() {
-		return "Ricomposizione";
+		return matchingFiles.length + " parti";
 	}
 
 	@Override

@@ -8,12 +8,14 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DecimalFormat;
 import java.util.regex.Pattern;
 
 public class FBTaskRebuildCustomNumber extends FBTask {
 	
 	private String currentDir;
 	private String originalFileName;
+	private File matchingFiles[];
 	private long rebuiltFileSize;
 
 	/**
@@ -33,16 +35,17 @@ public class FBTaskRebuildCustomNumber extends FBTask {
 		}
 		sb.deleteCharAt(sb.length()-1);
 		originalFileName = sb.toString();
+		
+		rebuiltFileSize = 0;
+		File currentDirectory = new File(super.getPathName().substring(0, super.getPathName().length() - super.getFileName().length()));
+		matchingFiles = getMatchingFiles(currentDirectory);
 	}
 	
 	/**
 	 * Ricostruzione del file dalle sue parti
 	 */
 	@Override
-	public void run() {
-		File currentDirectory = new File(super.getPathName().substring(0, super.getPathName().length() - super.getFileName().length()));
-		File matchingFiles[] = getMatchingFiles(currentDirectory);
-		
+	public void run() {		
 		try {
 			long currentFileSize;
 			setProcessed(0);
@@ -90,13 +93,33 @@ public class FBTaskRebuildCustomNumber extends FBTask {
 		        return name.matches(regex.toString());
 		    }
 		});
-		
+
+		for(int i=0; i<matchingFiles.length; i++) {
+			rebuiltFileSize += matchingFiles[i].length();
+		}
 		return matchingFiles;
 	}
 
 	@Override
+	public String getFileSizeFormatted() {
+		DecimalFormat df = new DecimalFormat("#.##");
+		if(rebuiltFileSize < 1000) {
+			return rebuiltFileSize + " B";
+		}
+		else if(rebuiltFileSize < 1000000) {
+			return df.format(((double)rebuiltFileSize)/1000) + " KB";
+		}
+		else if(rebuiltFileSize < 1000000000) {
+			return df.format(((double)rebuiltFileSize)/1000000) + " MB";
+		}
+		else {
+			return df.format(((double)rebuiltFileSize)/1000000000) + " GB";
+		}
+	}
+	
+	@Override
 	public String getParameters() {
-		return "Ricomposizione";
+		return matchingFiles.length + " parti";
 	}
 
 	@Override

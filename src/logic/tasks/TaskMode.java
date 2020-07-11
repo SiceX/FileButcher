@@ -12,7 +12,7 @@ package logic.tasks;
  * <br>-REBUILD_SAME_SIZE:	Ricomposizione di un file a partire dalla prima di N parti di dimensione uguale
  * <br>-REBUILD_CRYPT_SAME_SIZE:	Ricomposizione e decifratura di un file a partire dalla prima di N parti di dimensione uguale
  * <br>-REBUILD_CUSTOM_NUMBER:	Ricomposizione di un file a partire dalla prima di N parti dove N era un numero definito dall'utente
- * @author nicola.ferrari
+ * @author Nicola Ferrari
  */
 public enum TaskMode {
 	/**

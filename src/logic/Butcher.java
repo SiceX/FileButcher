@@ -7,7 +7,7 @@ import logic.tasks.FBTask;
 
 /**
  * Chiama in ordine gli FBTask e li assegna ognuno ad un Thread
- * @author nicola.ferrari
+ * @author Nicola Ferrari
  */
 public final class Butcher {
 

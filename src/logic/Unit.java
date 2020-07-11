@@ -6,7 +6,7 @@ package logic;
  * <br>- KB	KiloByte
  * <br>- MB	MegaByte
  * <br>- GB	GigaByte
- * @author Sice
+ * @author Nicola Ferrari
  */
 public enum Unit {
 	B,		//Byte

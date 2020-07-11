@@ -10,7 +10,7 @@ import javax.crypto.Cipher;
  * Definisce il procedimento per scomporre un file in numero N di parti specificato dall'utente, estende la classe FBTask
  * @see FBTask
  * @see TaskMode
- * @author Sice
+ * @author Nicola Ferrari
  */
 public class FBTaskButcherCustomNumber extends FBTask {
 	

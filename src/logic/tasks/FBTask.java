@@ -16,7 +16,7 @@ import javax.swing.filechooser.FileSystemView;
  * <br>	Estende Observable per permettere alla tabella nella finestra principale di aggiornare le opportune barre di progresso
  * 		man mano che il task viene completato.
  * <br> Implementa Runnable per poter permettere l'esecuzione in parallelo dei Task.
- * @author Sice
+ * @author Nicola Ferrari
  */
 public abstract class FBTask extends Observable implements Runnable{
 	

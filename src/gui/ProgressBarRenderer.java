@@ -8,7 +8,7 @@ import javax.swing.table.TableCellRenderer;
 
 /**
  * Renderer custom per la barra di progresso dei Task nella tabella
- * @author Sice
+ * @author Nicola Ferrari
  */
 public class ProgressBarRenderer extends JProgressBar implements TableCellRenderer {
 

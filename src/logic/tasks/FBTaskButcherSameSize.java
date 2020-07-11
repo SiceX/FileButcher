@@ -11,7 +11,7 @@ import javax.crypto.Cipher;
  * Definisce il procedimento per scomporre un file in parti uguali, estende la classe FBTask
  * @see FBTask
  * @see TaskMode
- * @author Sice
+ * @author Nicola Ferrari
  */
 public class FBTaskButcherSameSize extends FBTask {
 	

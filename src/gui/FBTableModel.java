@@ -15,7 +15,7 @@ import logic.tasks.TaskMode;
 
 /**
  * Modello custom della tabella
- * @author Sice
+ * @author Nicola Ferrari
  */
 public class FBTableModel extends AbstractTableModel implements Observer{
 	

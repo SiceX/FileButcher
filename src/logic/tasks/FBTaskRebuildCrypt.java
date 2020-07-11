@@ -21,7 +21,7 @@ import javax.crypto.spec.SecretKeySpec;
  * Definisce il procedimento per ricostruire un file dalle sue parti uguali cifrate, estende la classe FBTask
  * @see FBTask
  * @see TaskMode
- * @author Sice
+ * @author Nicola Ferrari
  */
 public class FBTaskRebuildCrypt extends FBTask {
 

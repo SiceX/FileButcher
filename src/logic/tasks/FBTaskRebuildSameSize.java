@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  * Definisce il procedimento per ricostruire un file dalle sue parti uguali, estende la classe FBTask
  * @see FBTask
  * @see TaskMode
- * @author Sice
+ * @author Nicola Ferrari
  */
 public class FBTaskRebuildSameSize extends FBTask {
 

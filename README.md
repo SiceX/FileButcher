@@ -14,4 +14,4 @@ La documentazione del progetto è disponibile [qui](https://sicex.github.io/File
 
 ## Screenshot
 
-![](doc/images/MainWindow.jpg)
+![](docs/images/MainWindow.jpg)

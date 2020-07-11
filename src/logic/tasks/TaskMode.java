@@ -36,21 +36,21 @@ public enum TaskMode {
 	/**
 	 * Ricomposizione di un file a partire dalla prima di N parti di dimensione uguale
 	 * <br>Estensione:	.par
-	 * <br>Descrizione:	Parti uguali
+	 * <br>Descrizione:	Ricostruzione, Parti uguali
 	 */
-	REBUILD_SAME_SIZE(".par", "Parti uguali"),
+	REBUILD_SAME_SIZE(".par", "Ricostruzione, Parti uguali"),
 	/**
 	 * Ricomposizione e decifratura di un file a partire dalla prima di N parti di dimensione uguale
 	 * <br>Estensione:	.crypar
-	 * <br>Descrizione:	Parti uguali sicuro
+	 * <br>Descrizione:	Ricostruzione, Parti uguali sicuro
 	 */
-	REBUILD_CRYPT_SAME_SIZE(".crypar", "Parti uguali sicuro"),
+	REBUILD_CRYPT_SAME_SIZE(".crypar", "Ricostruzione, Parti uguali sicuro"),
 	/**
 	 * Ricomposizione di un file a partire dalla prima di N parti dove N era un numero definito dall'utente
 	 * <br>Estensione:	.parn
-	 * <br>Descrizione:	N parti
+	 * <br>Descrizione:	Ricostruzione, N parti
 	 */
-	REBUILD_CUSTOM_NUMBER(".parn", "N parti");
+	REBUILD_CUSTOM_NUMBER(".parn", "Ricostruzione, N parti");
 	
 	/**
 	 * Estensione del file corrispondente

@@ -7,35 +7,72 @@ import java.util.Observable;
 import javax.swing.filechooser.FileSystemView;
 
 /**
+ * Classe padre di tutti i Task.
+ * <br>	Estende Observable per permettere alla tabella nella finestra principale di aggiornare le opportune barre di progresso
+ * 		man mano che il task viene completato.
+ * <br> Implementa Runnable per poter permettere l'esecuzione in parallelo dei Task.
  * @author Sice
- *
  */
 public abstract class FBTask extends Observable implements Runnable{
 	
 	/**
 	 * Cartella dove vengono riposti i risultati delle operazioni
 	 */
-	public static final String TASKS_DIR = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\File Splitter\\";
+	protected static final String TASKS_DIR = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\File Splitter\\";
+	/**
+	 * Massima grandezza di un singolo blocco da tenere in memoria prima che venga scritto su disco
+	 */
 	protected static final int BLOCK_MAX_SIZE = 50000000;
 	/**
-	 * Cartella dove vengono generati i file macellati
+	 * Cartella dove vengono generati i file processati
 	 */
-	public String splittedDir;
+	private String splittedDir;
+	/**
+	 * L'indirizzo completo del file
+	 */
 	private String pathName;
+	/**
+	 * Il nome del file senza estensione
+	 */
 	private String fileNameNoExt;
+	/**
+	 * Il nome completo del file
+	 */
 	private String fileName;
-	protected String password;
+	/**
+	 * Dimensione in Byte del file
+	 */
 	private long fileSize;
+	/**
+	 * La quantità di Byte processati finora
+	 */
 	protected long processed;
+	/**
+	 * True: Il task è stato completato
+	 * <br>False: Il task non è ancora stato completato
+	 */
 	private boolean completed;
+	/**
+	 * La modalità con cui viene processato il Task.
+	 * @see TaskMode
+	 */
 	private TaskMode mode;
 	
+	/**
+	 * Crea un FBTask con i valori forniti
+	 * @see FBTask 
+	 * @param path	Indirizzo completo del file, compreso il file stesso
+	 * @param name	Il nome completo del file
+	 * @param tMode	La modalità con cui viene processato il Task.
+	 * @see TaskMode
+	 * @param fSize La dimensione in Byte del file
+	 */
 	public FBTask(String path, String name, TaskMode tMode, long fSize) {
 		setPathName(path);
 		setFileName(name);
 		setFileNameNoExt(name.split("\\.")[0]);
 		setMode(tMode);
-		splittedDir = TASKS_DIR + getFileNameNoExt() + "\\";
+		setSplittedDir(TASKS_DIR + getFileNameNoExt() + "\\");
 		fileSize = fSize;
 		processed = 0;
 		setCompleted(false);
@@ -59,26 +96,25 @@ public abstract class FBTask extends Observable implements Runnable{
 		
 	}
 	
+	/**
+	 * Crea la cartella dentro cui verranno generati le parti del file, con il nome del file originario (meno l'estensione).
+	 * <br>Viene chiamata prima di iniziare il "butchering" vero e proprio.
+	 */
 	protected void createButcheringResultDir() {
-		File resultDir = new File(splittedDir);
+		File resultDir = new File(getSplittedDir());
 	    if (!resultDir.exists()){
 	    	resultDir.mkdir();
 	    }
 	}
-	
-	public String getModeDescription() {
-		switch(mode) {
-		case BUTCHER_SAME_SIZE:
-			return "Divisione in parti di dimensioni uguali";
-		case BUTCHER_CRYPT_SAME_SIZE:
-			return "Divisione in parti di dimensioni uguali con crittografia";
-		case BUTCHER_CUSTOM_NUMBER:
-			return "Divisione in N parti";
-		default:
-			throw new NullPointerException();
-		}
-	}
 
+	/**
+	 * Formatta la dimensione del file (memorizzata in numero di Byte) in una versione più umanamente leggibile
+	 * @return	Stringa con la dimensione espressa in:
+	 * <br>- Byte, se è minore di 10^3;
+	 * <br>- KB, se è maggiore di 10^3 e minore di 10^6;
+	 * <br>- MB, se è maggiore di 10^6 e minore di 10^9;
+	 * <br>- GB, altrimenti;
+	 */
 	public String getFileSizeFormatted() {
 		DecimalFormat df = new DecimalFormat("#.##");
 		if(fileSize < 1000) {
@@ -95,10 +131,18 @@ public abstract class FBTask extends Observable implements Runnable{
 		}
 	}
 
+	/**
+	 * @return La modalità con cui viene processato il Task.
+	 * @see TaskMode
+	 */
 	public TaskMode getMode() {
 		return mode;
 	}
 	
+	/**
+	 * @param type La modalità con cui viene processato il Task.
+	 * @see TaskMode
+	 */
 	public void setMode(TaskMode type) {
 		this.mode = type;
 	}
@@ -144,10 +188,6 @@ public abstract class FBTask extends Observable implements Runnable{
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
-
-	public void setPassword(String cryptKey) {
-		this.password = cryptKey;
-	}
 	
 	public String getParameters() {
 		return null;
@@ -155,32 +195,70 @@ public abstract class FBTask extends Observable implements Runnable{
 	
 	public void setParameters(Object param) {}
 
+	/**
+	 * @return La dimensione in Byte del file
+	 */
 	public long getFileSize() {
 		return fileSize;
 	}
 
+	/**
+	 * @return La quantità di Byte processati finora
+	 */
 	public long getProcessed() {
 		return processed;
 	}
 
+	/**
+	 * @param proc Quantità di Byte processati aggiornata
+	 */
 	protected void setProcessed(long proc) {
 		processed = proc;
 		setChanged();
 		notifyObservers(this); 
 	}
 	
+	/**
+	 * Metodo astratto lasciato implementato da ogni tipo di Task
+	 * @return	Un decimale da 0 a 100 che rappresenta la percentuale di completamento del task
+	 */
 	public abstract double getProcessedPercentage();
 	
+	/**
+	 * @return L'estensione del file corrispondente
+	 * @see TaskMode
+	 */
 	public String getFileExtension() {
 		return mode.getFileExtension();
 	}
 
+	/**
+	 * @return - True se il task è stato completato;
+	 * <br>- False se il task non è ancora stato completato
+	 */
 	public boolean isCompleted() {
 		return completed;
 	}
 
+	/**
+	 * @param completed Lo stato di completamento del task aggiornato
+	 */
 	public void setCompleted(boolean completed) {
 		this.completed = completed;
+	}
+
+	/**
+	 * @return La cartella dove vengono generati i file processati
+	 */
+	public String getSplittedDir() {
+		return splittedDir;
+	}
+
+	/**
+	 * @param splittedDir La cartella dove vengono generati i file processati
+	 */
+	public void setSplittedDir(String splittedDir) {
+		this.splittedDir = splittedDir;
 	}
 
 	

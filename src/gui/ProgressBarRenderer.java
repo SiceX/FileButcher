@@ -6,7 +6,10 @@ import javax.swing.JProgressBar;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-@SuppressWarnings("serial")
+/**
+ * Renderer custom per la barra di progresso dei Task nella tabella
+ * @author Sice
+ */
 public class ProgressBarRenderer extends JProgressBar implements TableCellRenderer {
 
 	public ProgressBarRenderer(int min, int max) {

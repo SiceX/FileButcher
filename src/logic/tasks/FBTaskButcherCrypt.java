@@ -11,20 +11,47 @@ import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+
+/**
+ * Definisce il procedimento per scomporre un file in parti uguali cifrate, estende la classe FBTask
+ * @see FBTask
+ * @see TaskMode
+ * @author Sice
+ */
 public class FBTaskButcherCrypt extends FBTask {
 	
+	/**
+	 * Dimensione delle parti specificata dall'utente, utilizzata all'interno della classe
+	 */
 	private long partSize;
+	/**
+	 * Cifrario utilizzato per cifrare il file
+	 */
 	private Cipher cipher;
+	/**
+	 * 
+	 */
 	private byte[] encodedKey;
 	private byte[] iv;
 	
+	/**
+	 * Crea un FBTaskButcherCrypt con i valori forniti.
+	 * Se pSize fosse più grande della dimensione effettiva del file, viene preso come pSize fileSize, 
+	 * creando quindi solo una versione cifrata del file originario. 
+	 * @param path	Indirizzo completo del file, compreso il file stesso
+	 * @param name	Il nome completo del file
+	 * @param fileSize	La dimensione in Byte del file
+	 * @param pSize	La dimensione delle parti specificata dall'utente
+	 */
 	public FBTaskButcherCrypt(String path, String name, long fileSize, long pSize){
 		super(path, name, TaskMode.BUTCHER_CRYPT_SAME_SIZE, fileSize);
 		partSize = pSize < fileSize ? pSize : fileSize;
 	}
 
 	/** 
-	 * Default
+	 * Crea un FBTaskButcherCrypt di default con i valori forniti e pSize uguale a 100 KB.
+	 * Se la dimensione effettiva del file fosse minore di 100 KB, viene presa come dimensione delle parti fileSize, 
+	 * creando quindi solo una versione cifrata del file originario. 
 	 * @param path		Nome completo di indirizzo del file
 	 * @param name		Solo il nome del file, senza il path
 	 * @param fileSize	Grandezza del file
@@ -34,7 +61,7 @@ public class FBTaskButcherCrypt extends FBTask {
 	}
 	
 	/**
-	 * Scomposizione in parti uguali
+	 * Scomposizione in parti uguali e cifratura
 	 */
 	@Override
 	public void run() {
@@ -72,7 +99,7 @@ public class FBTaskButcherCrypt extends FBTask {
 				oStream.close();
 				// Salvo la chiave codificata nel primo file
 				if(fileCount == 1) { 
-					oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", splittedDir+getFileName(), fileCount, getFileExtension()), true));
+					oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", getSplittedDir()+getFileName(), fileCount, getFileExtension()), true));
 					oStream.write(encodedKey);
 					oStream.write(iv);
 					oStream.close();
@@ -113,7 +140,7 @@ public class FBTaskButcherCrypt extends FBTask {
 	 * @throws FileNotFoundException
 	 */
 	private OutputStream getStream(int fileCount, boolean append) throws FileNotFoundException { 
-		return new CipherOutputStream(new FileOutputStream(String.format("%s.%d%s", splittedDir+getFileName(), fileCount, getFileExtension()), append), cipher);
+		return new CipherOutputStream(new FileOutputStream(String.format("%s.%d%s", getSplittedDir()+getFileName(), fileCount, getFileExtension()), append), cipher);
 	}
 	
 	@Override

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="javadoc">
+    <target name="javadoc">
+        <javadoc access="public" author="true" classpath="libraries/org.eclipse.ui.forms_3.8.200.v20191114-0830.jar;libraries/org.eclipse.ui.workbench_3.117.0.v20191126-1131.jar;libraries/org.eclipse.equinox.registry_3.8.600.v20191017-2055.jar;libraries/org.eclipse.equinox.common_3.10.600.v20191004-1420.jar;libraries/miglayout15-swing.jar;libraries/org.eclipse.core.runtime_3.17.0.v20191122-2104.jar;libraries/org.eclipse.swt.win32.win32.x86_64_3.113.0.v20191204-0601.jar;libraries/org.eclipse.text_3.10.0.v20191122-2108.jar;libraries/org.eclipse.core.commands_3.9.600.v20191122-2109.jar;libraries/org.eclipse.jface.text_3.16.100.v20191203-1634.jar;libraries/org.eclipse.osgi_3.15.100.v20191114-1701.jar" destdir="doc" doctitle="FileButcher" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="logic.tasks,gui,logic" source="1.8" sourcefiles="src/FileButcherMain.java" sourcepath="src" splitindex="true" stylesheetfile="F:\RepoHDD\eclipse-workspace\FileButcher\doc\stylesheet.css" use="true" version="true">
+            <link href="https://docs.oracle.com/javase/8/docs/api/"/>
+            <link href="http://docs.oracle.com/javase/8/javafx/api/"/>
+        </javadoc>
+    </target>
+</project>

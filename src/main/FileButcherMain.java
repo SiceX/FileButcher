@@ -1,3 +1,5 @@
+package main;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -10,6 +12,7 @@ public class FileButcherMain {
 
 	/**
 	 * Crea cartella dei risultati e cartella data (se non esistenti) e lancia l'applicazione.
+	 * @param args Argomenti passabili dalla chiamata da linea di comando, non utilizzati.
 	 */
 	public static void main(String[] args) {
 		String resultDirectory = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\File Splitter";

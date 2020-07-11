@@ -82,7 +82,7 @@ public class FBTaskButcherSameSize extends FBTask {
 	 * @throws FileNotFoundException
 	 */
 	private OutputStream getStream(int fileCount, boolean append) throws FileNotFoundException { 
-			return new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", splittedDir+getFileName(), fileCount, getFileExtension()), append));
+			return new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", getSplittedDir()+getFileName(), fileCount, getFileExtension()), append));
 	}
 	
 	@Override

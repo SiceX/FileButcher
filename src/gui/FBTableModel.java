@@ -13,10 +13,16 @@ import logic.tasks.FBTaskButcherCustomNumber;
 import logic.tasks.FBTaskButcherSameSize;
 import logic.tasks.TaskMode;
 
-@SuppressWarnings("serial")
+/**
+ * Modello custom della tabella
+ * @author Sice
+ */
 public class FBTableModel extends AbstractTableModel implements Observer{
 	
 	private final String[] columnNames = {"File", "Modalità", "Parametri", "Dimensione", "Progresso"};
+	/**
+	 * Lista dei FBTask
+	 */
 	private final ArrayList<FBTask> data = new ArrayList<FBTask>();
 	
 	public FBTableModel() {	}
@@ -48,6 +54,11 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 		return data.size();
 	}
 		
+	/**
+	 * Gestisce la modifica di due colonne:
+	 * <br>- tipo di task (in caso sia un task di scomposizione);
+	 * <br>- parametri del task (che possono essere la grandezza delle parti o il numero)
+	 */
 	@Override
 	public void setValueAt(Object value, int rowIndex, int columnIndex) {
 		if(columnIndex == 1) {	//Modifica tipo di task
@@ -78,18 +89,25 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 						data.get(rowIndex).setParameters(nParts);
 					}
 				}
-				catch(NumberFormatException e) {} //Do nothing
+				catch(NumberFormatException e) {} //Non modificare il valore
 			}
 		}
 	 	fireTableRowsUpdated(rowIndex, rowIndex);
 	}
 
 	/**
-	 * @param newStr
-	 * @return specified size in bytes if validation succeeds, -1 otherwise
+	 * Valida la stringa immessa dall'utente in base ad una regex:
+	 * <br>accetta un numero arbitrario di cifre, anche diviso da un punto o una virgola per i decimali,
+	 * che può essere seguito dall'unità di misura (B, KB, MB, GB, maiuscoli o minuscoli).
+	 * <br>- Se viene usata la virgola come divisore per il decimale, viene sostituita da un punto e "parsato" a double;
+	 * <br>- Se si scrive un decimale e non si specifica una misura (quindi viene assunto Byte), viene troncato ad intero;
+	 * <br>- Se non è specificata un'unità di misura, viene assunto sia Byte;
+	 * <br>- Per le altre unità di misura, il dato viene convertito a Byte.
+	 * @param newStr Nuova stringa immessa dall'utente
+	 * @return long: Dimensione specificata in byte se la validazione ha successo, -1 altrimenti
 	 */
 	private long validateAndParse(String newStr) {
-		if(newStr.matches("^[0-9]+[.,]?[0-9]*(\\s[KMGkmg]?[Bb])?$")) {		//numero con possibili decimali e possibile unità
+		if(newStr.matches("^[0-9]+[.,]?[0-9]*(\\s[KMGkmg]?[Bb])?$")) {		//numero con possibili decimali e possibile unità di misura
 			String[] splits = newStr.split("\\s");
 			double size = Double.parseDouble(splits[0].replaceAll(",", "."));	//parte col numero
 			if(splits.length > 1) {
@@ -127,6 +145,10 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 		
 	}
 	
+	/**
+	 * Gestisce la modificabilità della colonna del tipo di Task.
+	 * Se il tipo di task della riga è di tipo Rebuild, la cella non è modificabile
+	 */
 	@Override
 	public boolean isCellEditable(int row, int col) {
 		TaskMode mode = data.get(row).getMode();
@@ -158,7 +180,8 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 		}
 	}
 
-	/** Se ci sono task completati, li rimuove dalla coda 
+	/** 
+	 * Se ci sono task completati, li rimuove dalla coda 
 	 */
 	private void purgeCompleted() {
 		for(int i=data.size()-1; i>=0; i--) {
@@ -167,23 +190,23 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 			}
 		}
 	}
-	
-	/** Se ci sono dei task che richiedono la crittazione, ne imposta la chiave di crittazione
-	 * @param cryptKey chiave di crittazione, password
-	 */
-	public void setPassword(char[] charKey) {
-		for(int i=0; i<data.size(); i++) {
-			data.get(i).setPassword(new String(charKey));
-		}
-	}
 
 	/**
-	 * @return the data
+	 * Ritorna la coda di Task
+	 * @return ArrayList di FBTask
 	 */
 	public ArrayList<FBTask> getData() {
 		return data;
 	}
 	
+	/**
+	 * Utility interna al modello per creare un task dati indirizzo, nome e dimensione del file e la sua modalità
+	 * @param path		Indirizzo file
+	 * @param name		Nome completo di estensione file
+	 * @param mode		Tipo di Task da eseguire
+	 * @param fileSize	Dimensione del file
+	 * @return	FBTask	un nuovo FBTask
+	 */
 	private FBTask createTask(String path, String name, TaskMode mode, long fileSize) {
 		switch(mode) {
 			case BUTCHER_SAME_SIZE:			return new FBTaskButcherSameSize(path, name, fileSize);
@@ -196,6 +219,10 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 		}
 	}
 
+	/**
+	 * Questa funzione viene chiamata quando la percentuale di completamento di un task cambia
+	 * per aggiornare le barre di progresso
+	 */
 	@Override
 	public void update(Observable o, Object arg) {
 		int index = data.indexOf(arg);

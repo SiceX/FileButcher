@@ -238,6 +238,7 @@ public class FBMainWindow extends JFrame{
 	 * @param path	Nome completo di indirizzo del file
 	 * @param name	Solo il nome del file, senza il path
 	 * @param ext	Estensione del file
+	 * @param fileSize	Dimensione del file scelto
 	 * @return FBTask	un FBTask del tipo corrispondente alla estensione della parte
 	 */
 	private FBTask createRebuildTask(String path, String name, String ext, long fileSize) {

@@ -140,20 +140,22 @@ public class FBTaskButcherCrypt extends FBTask {
 	/** Inizializzazione del Cipher con una chiave generata sul momento
 	 * Algoritmo AES con PKCS5Padding e metodo CBC.
 	 * CBC usa uno XOR tra i blocchi per rendere la codifica nel complesso più sicura.
-	 * @throws NoSuchAlgorithmException 
-	 * @throws NoSuchPaddingException 
-	 * @throws InvalidKeyException 
-	 * @throws Exception
 	 */
-	private void initCipher() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
-		KeyGenerator keyGen = KeyGenerator.getInstance("AES");
-		keyGen.init(256); // Key size
-		SecretKey key = keyGen.generateKey();
-		cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-		cipher.init(Cipher.ENCRYPT_MODE, key);
+	private void initCipher(){
+		KeyGenerator keyGen;
+		try {
+			keyGen = KeyGenerator.getInstance("AES");
 		
-		encodedKey = key.getEncoded();
-		iv = cipher.getIV();
+			keyGen.init(256); // Key size
+			SecretKey key = keyGen.generateKey();
+			cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+			cipher.init(Cipher.ENCRYPT_MODE, key);
+			encodedKey = key.getEncoded();
+			iv = cipher.getIV();
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
+			// Non davvero possibile che vengano lanciate queste eccezioni
+			e.printStackTrace();
+		}
 	}
 	
 	/**

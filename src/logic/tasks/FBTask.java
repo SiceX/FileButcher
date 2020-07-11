@@ -1,6 +1,11 @@
 package logic.tasks;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.Observable;
 
@@ -89,12 +94,10 @@ public abstract class FBTask extends Observable implements Runnable{
 	}
 	
 	/**
-	 * L'esecuzione del task
+	 * Metodo astratto per l'esecuzione del task, lasciato da implementare alle classi figlie
 	 */
 	@Override
-	public void run() {
-		
-	}
+	public abstract void run();
 	
 	/**
 	 * Crea la cartella dentro cui verranno generati le parti del file, con il nome del file originario (meno l'estensione).
@@ -130,7 +133,37 @@ public abstract class FBTask extends Observable implements Runnable{
 			return df.format(((double)fileSize)/1000000000) + " GB";
 		}
 	}
-
+	
+	/**
+	 * Definizione base della funzione per scrivere dei byte su file
+	 * @param oStream	OutputStream su cui scrivere
+	 * @param bytes		Bytes di dati da scrivere
+	 * @throws IOException
+	 */
+	protected void writeBytes(OutputStream oStream, byte[] bytes) throws IOException {
+		oStream.write(bytes);
+	}
+	
+	/** Crea l'OutputStream per una nuova parte di file, col nome costruito dal nome del file originale, il contatore delle parti e l'estensione del metodo
+	 * @param fileCount	Counter delle parti, impostare -1 se non si vuole aggiungere
+	 * @param append	Se aprire o no lo stream in modalità append
+	 * @return	OutputStream
+	 * @throws FileNotFoundException
+	 */
+	protected OutputStream getOutputStream(int fileCount, boolean append) throws FileNotFoundException {
+		return new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", getSplittedDir()+getFileName(), fileCount, getFileExtension()), append));
+	}
+	
+	/** Crea l'OutputStream per un file ricostruito, nella cartella da cui è stata presa la prima parte e col nome del file originale
+	 * @param currentDir	La cartella da cui è stata selezionata la prima parte del file da ricostruire
+	 * @param originalFileName	Il nome originale del file ottenuto dal nome della parte
+	 * @return	OutputStream
+	 * @throws FileNotFoundException
+	 */
+	protected OutputStream getOutputStream(String currentDir, String originalFileName) throws FileNotFoundException {
+		return new BufferedOutputStream(new FileOutputStream(currentDir+originalFileName, true));
+	}
+	
 	/**
 	 * @return La modalità con cui viene processato il Task.
 	 * @see TaskMode
@@ -189,11 +222,17 @@ public abstract class FBTask extends Observable implements Runnable{
 		this.fileName = fileName;
 	}
 	
-	public String getParameters() {
-		return null;
-	}
+	/**
+	 * Metodo astratto lasciato da implementare alle classi figlie
+	 * @return Una stringa contenente la rappresentazione dei parametri corrispondente alla classe figlia.
+	 */
+	public abstract String getParameters();
 	
-	public void setParameters(Object param) {}
+	/**
+	 * Metodo astratto lasciato da implementare alle classi figlie
+	 * @param param Un oggetto contenente la rappresentazione dei parametri corrispondente alla classe figlia.
+	 */
+	public abstract void setParameters(Object param);
 
 	/**
 	 * @return La dimensione in Byte del file

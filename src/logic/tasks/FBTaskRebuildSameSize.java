@@ -1,28 +1,48 @@
 package logic.tasks;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.regex.Pattern;
 
+/**
+ * Definisce il procedimento per ricostruire un file dalle sue parti uguali, estende la classe FBTask
+ * @see FBTask
+ * @see TaskMode
+ * @author Sice
+ */
 public class FBTaskRebuildSameSize extends FBTask {
 
+	/**
+	 * La cartella dove si trova la prima parte, sarà anche dove sarà messo il file ricostruito
+	 */
 	private String currentDir;
+	/**
+	 * Nome originale del file, ricavato dal nome della prima parte
+	 */
 	private String originalFileName;
+	/**
+	 * Array con i puntamenti alle altre parti da cui ricostruire il file originario
+	 */
 	private File matchingFiles[];
+	/**
+	 * Dimensione calcolata che avrà il file ricostruito
+	 */
 	private long rebuiltFileSize;
 
 	/**
-	 * Rebuild Task
-	 * @param path		Nome completo di indirizzo del file
-	 * @param name		Solo il nome del file, senza il path
-	 * @param fileSize	Grandezza del file
+	 * Crea un FBTaskRebuildSameSize con i valori forniti.
+	 * <br>Vengono salvati anche:
+	 * <br>- La cartella che contiene la prima parte;
+	 * <br>- Il nome del file originario (ottenuto dal nome della parte);
+	 * <br>- L'Array delle altre parti trovate nella stessa cartella.
+	 * @param path	Indirizzo completo della prima parte, compresa la parte stessa
+	 * @param name	Il nome completo della prima parte
+	 * @param fileSize	La dimensione in Byte della prima parte
 	 */
 	public FBTaskRebuildSameSize(String path, String name, long fileSize) {
 		super(path, name, TaskMode.REBUILD_SAME_SIZE, fileSize);
@@ -41,7 +61,13 @@ public class FBTaskRebuildSameSize extends FBTask {
 	}
 	
 	/**
-	 * Ricostruzione del file dalle sue parti
+	 * Esegue la ricostruzione del file originario dalle sue parti uguali.
+	 * <br>Questo metodo si occupa di:
+	 * <br>- Leggere da ogni parte e ricopiarne i dati nel nuovo file ricostruito;
+	 * <br>- Se la grandezza della parte è maggiore della costante definita nella superclasse BLOCK_MAX_SIZE (50 MB), 
+	 * 		 la lettura e scrittura viene suddivisa in più scritture separate di grandezza BLOCK_MAX_SIZE per evitare di trattenere un eccessiva quantità di dati in memoria;
+	 * <br>- Aggiornare il valore del progresso.
+	 * @see BLOCK_MAX_SIZE
 	 */
 	@Override
 	public void run() {
@@ -53,16 +79,16 @@ public class FBTaskRebuildSameSize extends FBTask {
 			InputStream iStream;
 			
 			for(int i=0; i<matchingFiles.length; i++) {
-				oStream = new BufferedOutputStream(new FileOutputStream(currentDir+originalFileName, true));
+				oStream = getOutputStream(currentDir, originalFileName);
 				iStream = new BufferedInputStream(new FileInputStream(matchingFiles[i].getPath()));
 				currentFileSize = matchingFiles[i].length();
 
 				while(currentFileSize > BLOCK_MAX_SIZE) {
 					byte[] bytes = new byte[BLOCK_MAX_SIZE];
 					iStream.read(bytes);
-					oStream.write(bytes);
+					writeBytes(oStream, bytes);
 					oStream.close();
-					oStream = new BufferedOutputStream(new FileOutputStream(currentDir+originalFileName, true));
+					oStream = getOutputStream(currentDir, originalFileName);
 					currentFileSize -= BLOCK_MAX_SIZE;
 					setProcessed(processed + BLOCK_MAX_SIZE);
 				}
@@ -70,7 +96,7 @@ public class FBTaskRebuildSameSize extends FBTask {
 				byte[] bytes = new byte[(int)currentFileSize];
 				iStream.read(bytes);
 				
-				oStream.write(bytes);
+				writeBytes(oStream, bytes);
 				oStream.close();
 				iStream.close();
 				setProcessed(processed + currentFileSize);
@@ -84,7 +110,7 @@ public class FBTaskRebuildSameSize extends FBTask {
 	
 	/** Ritrovamento delle altre parti del file dalla stessa directory
 	 * @param currentDirectory	Directory dove si trova la prima parte
-	 * @return	Array di File contenente le parti successive
+	 * @return Array di File contenente le parti successive
 	 */
 	private File[] getMatchingFiles(File currentDirectory) {
 		String extension = super.getFileExtension();
@@ -102,6 +128,14 @@ public class FBTaskRebuildSameSize extends FBTask {
 		return matchingFiles;
 	}
 	
+	/**
+	 * Formatta la dimensione che avrà il file originario (calcolata in numero di Byte) in una versione più umanamente leggibile
+	 * @return	Stringa con la dimensione espressa in:
+	 * <br>- Byte, se è minore di 10^3;
+	 * <br>- KB, se è maggiore di 10^3 e minore di 10^6;
+	 * <br>- MB, se è maggiore di 10^6 e minore di 10^9;
+	 * <br>- GB, altrimenti;
+	 */
 	@Override
 	public String getFileSizeFormatted() {
 		DecimalFormat df = new DecimalFormat("#.##");
@@ -119,11 +153,23 @@ public class FBTaskRebuildSameSize extends FBTask {
 		}
 	}
 	
+	/**
+	 * @return Una stringa contenente la quantità di parti che sono state trovate
+	 */
 	@Override
 	public String getParameters() {
 		return matchingFiles.length + " parti";
 	}
 
+	/**
+	 * Non è possibile cambiare i parametri di un Task di ricostruzione
+	 */
+	@Override
+	public void setParameters(Object param) {}
+	
+	/**
+	 * Calcola il progresso nell'esecuzione del Task come numero di byte processati divisa la dimensione che avrà il file ricostruito, per 100.
+	 */
 	@Override
 	public double getProcessedPercentage() {
 		double progress = ((double)getProcessed() / rebuiltFileSize) * 100;

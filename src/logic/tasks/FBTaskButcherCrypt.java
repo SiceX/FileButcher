@@ -1,15 +1,18 @@
 package logic.tasks;
 
-import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
+
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.CipherOutputStream;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
 /**
@@ -29,9 +32,12 @@ public class FBTaskButcherCrypt extends FBTask {
 	 */
 	private Cipher cipher;
 	/**
-	 * 
+	 * Chiave di codifica per la cifratura
 	 */
 	private byte[] encodedKey;
+	/**
+	 * Vettore di inizializzazione per la cifratura
+	 */
 	private byte[] iv;
 	
 	/**
@@ -61,33 +67,48 @@ public class FBTaskButcherCrypt extends FBTask {
 	}
 	
 	/**
-	 * Scomposizione in parti uguali e cifratura
+	 * Esegue la scomposizione in parti uguali e la cifratura.
+	 * <br>Questo metodo si occupa di:
+	 * <br>- Creare la cartella dove verranno generate le parti (Documents/Splitted Files/[nome file da dividere]);
+	 * <br>- Inizializzare il cifrario;
+	 * <br>- Leggere dal file originario e scrivere i dati cifrati nei file .crypar, nominandoli con un contatore di parte;
+	 * <br>- Se la grandezza della parte è maggiore della costante definita nella superclasse BLOCK_MAX_SIZE (50 MB), la lettura e scrittura della parte viene suddivisa in più scritture separate
+	 * 		 di grandezza BLOCK_MAX_SIZE per evitare di trattenere un eccessiva quantità di dati in memoria;
+	 * <br>- Aggiornare il valore del progresso;
+	 * <br>- Salvare in fondo alla prima parte la chiave generata e il vettore iniziale.
+	 * @see encodedKey
+	 * @see iv
+	 * @see BLOCK_MAX_SIZE
+	 * @see Cipher
 	 */
 	@Override
 	public void run() {
 		super.createButcheringResultDir();
+		try {
+			initCipher();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
 		
 		try {
 			int fileCount = 1;
 			long currentPartSize = 0;
 			processed = 0;
 			
-			initCipher();
-			
 			InputStream iStream = new FileInputStream(getPathName());
 			OutputStream oStream;
 			
 			do {
- 				oStream = getStream(fileCount, false);
+ 				oStream = getOutputStream(fileCount, false);
 				long remainingBytes = getFileSize() - processed;
  				currentPartSize = ( partSize < remainingBytes ) ? partSize : remainingBytes;
 				
 				while(currentPartSize > BLOCK_MAX_SIZE) {
 					byte[] bytes = new byte[BLOCK_MAX_SIZE];
 					iStream.read(bytes, 0, BLOCK_MAX_SIZE);
-					oStream.write(bytes);
+					writeBytes(oStream, bytes);
 					oStream.close();
-					oStream = getStream(fileCount, true);
+					oStream = getOutputStream(fileCount, true);
 					currentPartSize -= BLOCK_MAX_SIZE;
 					setProcessed(processed + BLOCK_MAX_SIZE);
 				}
@@ -95,13 +116,13 @@ public class FBTaskButcherCrypt extends FBTask {
 				byte[] bytes = new byte[(int)currentPartSize];
 				iStream.read(bytes, 0, (int)currentPartSize);
 				
-				oStream.write(bytes);
+				writeBytes(oStream, bytes);
 				oStream.close();
 				// Salvo la chiave codificata nel primo file
 				if(fileCount == 1) { 
-					oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", getSplittedDir()+getFileName(), fileCount, getFileExtension()), true));
-					oStream.write(encodedKey);
-					oStream.write(iv);
+					oStream = getOutputStream(fileCount, true);
+					super.writeBytes(oStream, encodedKey);
+					super.writeBytes(oStream, iv);
 					oStream.close();
 				}
 				fileCount++;
@@ -116,13 +137,15 @@ public class FBTaskButcherCrypt extends FBTask {
 		}
 	}
 	
-	/** Inizializzazione del Cipher con la password fornita
-	 * Algoritmo AES con padding e metodo CBC (instead of EBC). PKCS5Padding
-	 * Mentre EBC critta i blocchi indipendentemente l'uno dall'altro,
+	/** Inizializzazione del Cipher con una chiave generata sul momento
+	 * Algoritmo AES con PKCS5Padding e metodo CBC.
 	 * CBC usa uno XOR tra i blocchi per rendere la codifica nel complesso più sicura.
+	 * @throws NoSuchAlgorithmException 
+	 * @throws NoSuchPaddingException 
+	 * @throws InvalidKeyException 
 	 * @throws Exception
 	 */
-	private void initCipher() throws Exception {
+	private void initCipher() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
 		KeyGenerator keyGen = KeyGenerator.getInstance("AES");
 		keyGen.init(256); // Key size
 		SecretKey key = keyGen.generateKey();
@@ -133,16 +156,28 @@ public class FBTaskButcherCrypt extends FBTask {
 		iv = cipher.getIV();
 	}
 	
-	/** Ritorna l'OutputStream appropriato, normale o criptato
-	 * @param fileCount Counter delle parti, impostare -1 se non si vuole aggiungere
-	 * @param append	Se aprire o no lo stream in modalità append
-	 * @return L'OutputStream appropriato, normale o criptato
-	 * @throws FileNotFoundException
+	/**
+	 * Sovrascrittura della funzione di base per scrivere dei byte su file
+	 * con gestione della cifratura dei dati tramite il Cipher
+	 * @see Cipher
+	 * @param oStream	OutputStream su cui scrivere
+	 * @param bytes		Bytes di dati da scrivere
+	 * @throws IOException
 	 */
-	private OutputStream getStream(int fileCount, boolean append) throws FileNotFoundException { 
-		return new CipherOutputStream(new FileOutputStream(String.format("%s.%d%s", getSplittedDir()+getFileName(), fileCount, getFileExtension()), append), cipher);
+	@Override
+	protected void writeBytes(OutputStream oStream, byte[] bytes) throws IOException {
+		try {
+			oStream.write(cipher.doFinal(bytes));
+		} catch (IllegalBlockSizeException e) {
+			e.printStackTrace();
+		} catch (BadPaddingException e) {
+			e.printStackTrace();
+		}
 	}
 	
+	/**
+	 * @return Una stringa contenente la dimensione massima di ogni parte in cui dividere il file
+	 */
 	@Override
 	public String getParameters() {
 		DecimalFormat df = new DecimalFormat("#.##");
@@ -160,6 +195,9 @@ public class FBTaskButcherCrypt extends FBTask {
 		}
 	}
 	
+	/**
+	 * @param param	Un long contenente la dimensione massima di ogni parte in cui dividere il file
+	 */
 	@Override
 	public void setParameters(Object param) {
 		if(param.getClass() == Long.class) {
@@ -167,6 +205,9 @@ public class FBTaskButcherCrypt extends FBTask {
 		}
 	}
 
+	/**
+	 * Calcola il progresso nell'esecuzione del Task come numero di byte processati divisa la dimensione del file intero, per 100.
+	 */
 	@Override
 	public double getProcessedPercentage() {
 		double progress = ((double)getProcessed() / getFileSize()) * 100;

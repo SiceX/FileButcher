@@ -38,6 +38,8 @@ public class FBTaskButcherCrypt extends FBTask {
 	 */
 	@Override
 	public void run() {
+		super.createButcheringResultDir();
+		
 		try {
 			int fileCount = 1;
 			long currentPartSize = 0;
@@ -70,7 +72,7 @@ public class FBTaskButcherCrypt extends FBTask {
 				oStream.close();
 				// Salvo la chiave codificata nel primo file
 				if(fileCount == 1) { 
-					oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension()), true));
+					oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", splittedDir+getFileName(), fileCount, getFileExtension()), true));
 					oStream.write(encodedKey);
 					oStream.write(iv);
 					oStream.close();
@@ -111,7 +113,7 @@ public class FBTaskButcherCrypt extends FBTask {
 	 * @throws FileNotFoundException
 	 */
 	private OutputStream getStream(int fileCount, boolean append) throws FileNotFoundException { 
-		return new CipherOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), fileCount, getFileExtension()), append), cipher);
+		return new CipherOutputStream(new FileOutputStream(String.format("%s.%d%s", splittedDir+getFileName(), fileCount, getFileExtension()), append), cipher);
 	}
 	
 	@Override

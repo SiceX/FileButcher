@@ -11,7 +11,6 @@ import logic.tasks.FBTask;
 import logic.tasks.FBTaskButcherCrypt;
 import logic.tasks.FBTaskButcherCustomNumber;
 import logic.tasks.FBTaskButcherSameSize;
-import logic.tasks.FBTaskButcherZipCustomSize;
 import logic.tasks.TaskMode;
 
 @SuppressWarnings("serial")
@@ -81,9 +80,6 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 				}
 				catch(NumberFormatException e) {} //Do nothing
 			}
-			else if(mode == TaskMode.BUTCHER_ZIP_CUSTOM_SIZE) {
-				//TODO DEFINIZIONE PARTI
-			}
 		}
 	 	fireTableRowsUpdated(rowIndex, rowIndex);
 	}
@@ -134,7 +130,7 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 	@Override
 	public boolean isCellEditable(int row, int col) {
 		TaskMode mode = data.get(row).getMode();
-		if(mode == TaskMode.BUTCHER_SAME_SIZE || mode == TaskMode.BUTCHER_CRYPT_SAME_SIZE || mode == TaskMode.BUTCHER_ZIP_CUSTOM_SIZE || mode == TaskMode.BUTCHER_CUSTOM_NUMBER) {
+		if(mode == TaskMode.BUTCHER_SAME_SIZE || mode == TaskMode.BUTCHER_CRYPT_SAME_SIZE || mode == TaskMode.BUTCHER_CUSTOM_NUMBER) {
 	        if(col == 1) return true;
 	        if(col == 2) return true;
 		}
@@ -193,8 +189,6 @@ public class FBTableModel extends AbstractTableModel implements Observer{
 			case BUTCHER_SAME_SIZE:			return new FBTaskButcherSameSize(path, name, fileSize);
 			
 			case BUTCHER_CRYPT_SAME_SIZE:	return new FBTaskButcherCrypt(path, name, fileSize);
-			
-			case BUTCHER_ZIP_CUSTOM_SIZE:	return new FBTaskButcherZipCustomSize(path, name, fileSize);
 			
 			case BUTCHER_CUSTOM_NUMBER:		return new FBTaskButcherCustomNumber(path, name, fileSize);
 			

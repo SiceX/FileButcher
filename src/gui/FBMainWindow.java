@@ -14,19 +14,20 @@ import logic.tasks.TaskMode;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import net.miginfocom.swing.MigLayout;
 
 @SuppressWarnings("serial")
 public class FBMainWindow extends JFrame{
-	/**
-	 * "F:\\Event\\Download" per Event,
-	 * System.getenv("HOMEPATH") + "\\Download" per altri pc
-	 */
-	public static final String RESULT_DIR = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\Splitted Files\\";
-	private final JFileChooser fileChooser = new JFileChooser("F:\\Event\\Download");
+	
+	public static final String RESULT_DIR = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\File Splitter\\";
+	private final JFileChooser fileChooser;
 	private final JTable tblQueue = new JTable();
 	private final JButton btnChooseFile = new JButton("Seleziona file(s)");
 	private final Window mainWindowReference = this;
@@ -36,11 +37,15 @@ public class FBMainWindow extends JFrame{
 	private final JButton btnRebuild = new JButton("Ricomponi file");
 	private final JPanel passwordPanel = new JPanel();
 	private final JButton btnOpenResDirectory = new JButton("Apri cartella risultati");
-	
-	
 
-	public FBMainWindow() {
+	/**
+	 * Creazione della finestra principale, con tabella dei Tasks e pulsanti delle funzioni
+	 */
+	public FBMainWindow(File lastDirectoryUsedFile) {
 		super();
+		
+		fileChooser = initFileChoiceDirectory(lastDirectoryUsedFile);
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("FileButcher");
 		setSize(600, 300);
@@ -61,10 +66,15 @@ public class FBMainWindow extends JFrame{
 		});
 		btnRebuild.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				FileNameExtensionFilter filter = new FileNameExtensionFilter("Parti di file", "par", "crypar", "zipar", "parn");
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Parti di file", "par", "crypar", "parn");
 				fileChooser.setFileFilter(filter);
 				int res = fileChooser.showOpenDialog(mainWindowReference);
 				if(res == JFileChooser.APPROVE_OPTION) {
+					try (PrintWriter out = new PrintWriter(lastDirectoryUsedFile)){
+						out.println(fileChooser.getCurrentDirectory());
+					} catch (FileNotFoundException ex) {
+						ex.printStackTrace();
+					}
 					File file = fileChooser.getSelectedFile();
 					String tokens[] = file.getName().split("\\.");
 					
@@ -108,6 +118,11 @@ public class FBMainWindow extends JFrame{
 			public void mouseClicked(MouseEvent arg0) {
 				int res = fileChooser.showOpenDialog(mainWindowReference);
 				if(res == JFileChooser.APPROVE_OPTION) {
+					try (PrintWriter out = new PrintWriter(lastDirectoryUsedFile)){
+						out.println(fileChooser.getCurrentDirectory());
+					} catch (FileNotFoundException ex) {
+						ex.printStackTrace();
+					}
 					File[] files = fileChooser.getSelectedFiles();
 					
 					for(int i=0; i<files.length; i++) {
@@ -149,9 +164,27 @@ public class FBMainWindow extends JFrame{
 		ProgressBarRenderer pbr = new ProgressBarRenderer(0, 100);
 		pbr.setStringPainted(true);
 		tblQueue.setDefaultRenderer(JProgressBar.class, pbr);
-				
+		
 	}
 	
+	/**
+	 * Questa funzione legge il file con l'ultima locazione utilizzata
+	 */
+	/**
+	 * @param lastDirectoryUsedFile File con l'ultima cartella utilizzata
+	 * @return JFileChooser sull'ultima cartella utilizzata
+	 */
+	private JFileChooser initFileChoiceDirectory(File lastDirectoryUsedFile) {
+		String line = null;
+        try (BufferedReader br = new BufferedReader(new FileReader(lastDirectoryUsedFile))) {
+            line = br.readLine();
+        } 
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+		return new JFileChooser(line);
+	}
+
 	/** Crea un Task di scomposizione di default, un SAME_SIZE con parti da 500 KB
 	 * @param path		Nome completo di indirizzo del file
 	 * @param name		Solo il nome del file, senza il path
@@ -173,8 +206,6 @@ public class FBMainWindow extends JFrame{
 			case ".par":			return new FBTaskRebuildSameSize(path, name, fileSize);
 			
 			case ".crypar":			return new FBTaskRebuildCrypt(path, name, fileSize);
-			
-			case ".zipar":			return null;//return new FBTaskZipCustomSize(path, name);
 			
 			case ".parn":			return new FBTaskRebuildCustomNumber(path, name, fileSize);
 			

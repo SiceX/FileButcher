@@ -30,6 +30,8 @@ public class FBTaskButcherCustomNumber extends FBTask {
 	 */
 	@Override
 	public void run() {
+		super.createButcheringResultDir();
+		
 		try {
 			long partSize = getFileSize()/numberOfParts;
 			long carryBytes = getFileSize()-(partSize*numberOfParts);
@@ -40,7 +42,7 @@ public class FBTaskButcherCustomNumber extends FBTask {
 			BufferedOutputStream oStream;
 			
 			for(int i=0; i<numberOfParts; i++) {
-				oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), i+1, getFileExtension())));
+				oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", splittedDir+getFileName(), i+1, getFileExtension())));
 				//Questo è per assicurarsi che l'ultima parte non si perda eventuali byte "di riporto"
  				currentPartSize = i != numberOfParts-1 ? partSize : partSize+carryBytes;
 				
@@ -49,7 +51,7 @@ public class FBTaskButcherCustomNumber extends FBTask {
 					iStream.read(bytes, 0, BLOCK_MAX_SIZE);
 					oStream.write(bytes);
 					oStream.close();
-					oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", RESULT_DIR+getFileName(), i+1, getFileExtension()), true));
+					oStream = new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", splittedDir+getFileName(), i+1, getFileExtension()), true));
 					currentPartSize -= BLOCK_MAX_SIZE;
 					setProcessed(processed + BLOCK_MAX_SIZE);
 				}

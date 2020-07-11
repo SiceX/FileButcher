@@ -1,19 +1,17 @@
-WINDOWBUILDER 
-swing designer
-click dx su classe -> open with -> designer
+# `FileButcher`
 
+Un semplice applicativo per dividere, cifrare e ricostruire i propri file in Java 8.
 
-jdk 13 open?	https://jdk.java.net/archive/
-NO, per via di un bug a windowbuilder non piacciono le versioni sopra la 1.8
+Scritto per [l'esame di Programmazione ad Oggetti](http://didattica.agentgroup.unimore.it/wiki/index.php/Programmazione_ad_Oggetti#Modalit.C3.A0_di_Sviluppo_del_Progetto_Java).
 
+## Specifiche
 
-window -> preferences -> java -> java compiler
+Documento con le specifiche del progetto reperibile al seguente [link](http://didattica.agentgroup.unimore.it/wiki/images/4/48/Tesina1920.pdf).
 
-project -> properties -> java -> java compiler
+## Documentazione
 
-project -> properties -> java build path -> libraries -> modulepath
+La documentazione del progetto è disponibile [qui](https://sicex.github.io/FileButcher), su GitHub Pages.
 
+## Screenshot
 
-Le referenced libraries probabilmente avranno un pathing diverso sui vari pc per via dei workspace differenti ('C:\' , 'F:\').
-Le JRE System Libraries potrebbe soffrire dello stesso problema, per questo dopo il primo commit dovranno essere ignorate come le referenced.
-Se si aggiungono librerie le si pushano la prima volta e poi le si ignorano.
+![](doc/images/MainWindow.jpg)

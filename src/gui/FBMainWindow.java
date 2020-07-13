@@ -29,7 +29,7 @@ public class FBMainWindow extends JFrame{
 	/**
 	 * Indirizzo della cartella di lavoro dell'applicazione, dove vengono generati i file processati
 	 */
-	public static final String RESULT_DIR = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\File Splitter\\";
+	public static final String RESULT_DIR = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\File Butcher\\";
 	/**
 	 * Indirizzo del file con l'ultima locazione visitata
 	 */

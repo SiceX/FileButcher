@@ -23,7 +23,7 @@ public abstract class FBTask extends Observable implements Runnable{
 	/**
 	 * Cartella dove vengono riposti i risultati delle operazioni
 	 */
-	protected static final String TASKS_DIR = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\File Splitter\\";
+	protected static final String TASKS_DIR = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\File Butcher\\";
 	/**
 	 * Massima grandezza di un singolo blocco da tenere in memoria prima che venga scritto su disco
 	 */

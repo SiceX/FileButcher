@@ -23,7 +23,7 @@ public abstract class FBTask extends Observable implements Runnable{
 	/**
 	 * Cartella dove vengono riposti i risultati delle operazioni
 	 */
-	protected static final String TASKS_DIR = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\File Butcher\\";
+	protected static final String TASKS_DIR = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\File Splitter\\";
 	/**
 	 * Massima grandezza di un singolo blocco da tenere in memoria prima che venga scritto su disco
 	 */
@@ -49,16 +49,16 @@ public abstract class FBTask extends Observable implements Runnable{
 	 */
 	private long fileSize;
 	/**
-	 * La quantitï¿½ di Byte processati finora
+	 * La quantità di Byte processati finora
 	 */
 	protected long processed;
 	/**
-	 * True: Il task ï¿½ stato completato
-	 * <br>False: Il task non ï¿½ ancora stato completato
+	 * True: Il task è stato completato
+	 * <br>False: Il task non è ancora stato completato
 	 */
 	private boolean completed;
 	/**
-	 * La modalitï¿½ con cui viene processato il Task.
+	 * La modalità con cui viene processato il Task.
 	 * @see TaskMode
 	 */
 	private TaskMode mode;
@@ -68,7 +68,7 @@ public abstract class FBTask extends Observable implements Runnable{
 	 * @see FBTask 
 	 * @param path	Indirizzo completo del file, compreso il file stesso
 	 * @param name	Il nome completo del file
-	 * @param tMode	La modalitï¿½ con cui viene processato il Task.
+	 * @param tMode	La modalità con cui viene processato il Task.
 	 * @see TaskMode
 	 * @param fSize La dimensione in Byte del file
 	 */
@@ -111,11 +111,11 @@ public abstract class FBTask extends Observable implements Runnable{
 	}
 
 	/**
-	 * Formatta la dimensione del file (memorizzata in numero di Byte) in una versione piï¿½ umanamente leggibile
+	 * Formatta la dimensione del file (memorizzata in numero di Byte) in una versione più umanamente leggibile
 	 * @return	Stringa con la dimensione espressa in:
-	 * <br>- Byte, se ï¿½ minore di 10^3;
-	 * <br>- KB, se ï¿½ maggiore di 10^3 e minore di 10^6;
-	 * <br>- MB, se ï¿½ maggiore di 10^6 e minore di 10^9;
+	 * <br>- Byte, se è minore di 10^3;
+	 * <br>- KB, se è maggiore di 10^3 e minore di 10^6;
+	 * <br>- MB, se è maggiore di 10^6 e minore di 10^9;
 	 * <br>- GB, altrimenti;
 	 */
 	public String getFileSizeFormatted() {
@@ -146,7 +146,7 @@ public abstract class FBTask extends Observable implements Runnable{
 	
 	/** Crea l'OutputStream per una nuova parte di file, col nome costruito dal nome del file originale, il contatore delle parti e l'estensione del metodo
 	 * @param fileCount	Counter delle parti, impostare -1 se non si vuole aggiungere
-	 * @param append	Se aprire o no lo stream in modalitï¿½ append
+	 * @param append	Se aprire o no lo stream in modalità append
 	 * @return	OutputStream
 	 * @throws FileNotFoundException
 	 */
@@ -154,8 +154,8 @@ public abstract class FBTask extends Observable implements Runnable{
 		return new BufferedOutputStream(new FileOutputStream(String.format("%s.%d%s", getSplittedDir()+getFileName(), fileCount, getFileExtension()), append));
 	}
 	
-	/** Crea l'OutputStream per un file ricostruito, nella cartella da cui ï¿½ stata presa la prima parte e col nome del file originale
-	 * @param currentDir	La cartella da cui ï¿½ stata selezionata la prima parte del file da ricostruire
+	/** Crea l'OutputStream per un file ricostruito, nella cartella da cui è stata presa la prima parte e col nome del file originale
+	 * @param currentDir	La cartella da cui è stata selezionata la prima parte del file da ricostruire
 	 * @param originalFileName	Il nome originale del file ottenuto dal nome della parte
 	 * @return	OutputStream
 	 * @throws FileNotFoundException
@@ -165,7 +165,7 @@ public abstract class FBTask extends Observable implements Runnable{
 	}
 	
 	/**
-	 * @return La modalitï¿½ con cui viene processato il Task.
+	 * @return La modalità con cui viene processato il Task.
 	 * @see TaskMode
 	 */
 	public TaskMode getMode() {
@@ -173,7 +173,7 @@ public abstract class FBTask extends Observable implements Runnable{
 	}
 	
 	/**
-	 * @param type La modalitï¿½ con cui viene processato il Task.
+	 * @param type La modalità con cui viene processato il Task.
 	 * @see TaskMode
 	 */
 	public void setMode(TaskMode type) {
@@ -242,14 +242,14 @@ public abstract class FBTask extends Observable implements Runnable{
 	}
 
 	/**
-	 * @return La quantitï¿½ di Byte processati finora
+	 * @return La quantità di Byte processati finora
 	 */
 	public long getProcessed() {
 		return processed;
 	}
 
 	/**
-	 * @param proc Quantitï¿½ di Byte processati aggiornata
+	 * @param proc Quantità di Byte processati aggiornata
 	 */
 	protected void setProcessed(long proc) {
 		processed = proc;
@@ -272,8 +272,8 @@ public abstract class FBTask extends Observable implements Runnable{
 	}
 
 	/**
-	 * @return - True se il task ï¿½ stato completato;
-	 * <br>- False se il task non ï¿½ ancora stato completato
+	 * @return - True se il task è stato completato;
+	 * <br>- False se il task non è ancora stato completato
 	 */
 	public boolean isCompleted() {
 		return completed;

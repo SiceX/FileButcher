@@ -13,7 +13,7 @@ public class FileButcherMain {
 	 * @param args Argomenti passabili dalla chiamata da linea di comando, non utilizzati.
 	 */
 	public static void main(String[] args) {
-		String resultDirectory = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\File Butcher";
+		String resultDirectory = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\File Splitter";
 		File directory = new File(resultDirectory);
 	    if (!directory.exists()){
 	        directory.mkdir();
